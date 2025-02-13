@@ -1,0 +1,148 @@
+/* Wrapper chính */
+.wrapper {
+    position: relative;
+    width: 420px;
+    height: 450px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(25px);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: height 0.4s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Khi active mở rộng chiều cao */
+.wrapper.active {
+    height: 520px;
+    transform: scale(1.02);
+}
+
+/* Ẩn form mặc định */
+.wrapper .form-box {
+    position: absolute;
+    width: 100%;
+    padding: 40px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s, visibility 0.4s, transform 0.4s;
+    transform: translateY(20px);
+}
+
+/* Hiển thị form login mặc định */
+.wrapper .form-box.login {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Khi active, ẩn login và hiện register */
+.wrapper.active .form-box.login {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+}
+
+.wrapper.active .form-box.register {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Input Styling */
+.input-box input {
+    width: 100%;
+    height: 45px; /* Giảm chiều cao input */
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    font-size: 14px; /* Nhỏ chữ một chút */
+    color: #fff;
+    padding: 12px 18px;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+
+/* Hover và Focus cho input */
+.input-box input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 8px rgba(200, 198, 190, 0.5);
+}
+
+/* Nút Button */
+form button {
+    width: 100%;
+    height: 42px; /* Giảm kích thước nút */
+    font-size: 16px; /* Nhỏ hơn một chút */
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Hover và active cho button */
+form button:hover {
+    transform: scale(1.03);
+}
+
+form button:active {
+    transform: scale(0.97);
+}
+
+/* Nút Register nhỏ hơn và có style riêng */
+.switch-btn {
+    width: 100%;
+    height: 40px;
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #6b846c;
+    border: none;
+    color: white;
+    font-size: 14px; /* Nhỏ hơn */
+    cursor: pointer;
+    border-radius: 25px;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.switch-btn:hover {
+    background-color: #45a049;
+    transform: scale(1.03);
+}
+
+.switch-btn:active {
+    transform: scale(0.97);
+}
+
+/* Loại bỏ gạch chân của Forgot password */
+.remember-forgot a {
+    text-decoration: none; /* Bỏ gạch chân */
+    font-weight: normal;
+    font-size: 14px;
+    color: #ddd; /* Màu nhẹ hơn */
+    transition: color 0.3s ease-in-out;
+}
+
+.remember-forgot a:hover {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
+}
+
+/* Link Register */
+.register-link p {
+    font-size: 14px;
+}
+
+.register-link p a {
+    font-weight: bold;
+    text-decoration: none; /* Bỏ gạch chân */
+    transition: color 0.3s ease-in-out;
+}
+
+.register-link p a:hover {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
+}
