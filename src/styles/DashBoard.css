@@ -1,0 +1,63 @@
+/* Container chính của Dashboard */
+.dashboard {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Tiêu đề chính */
+.dashboard h1 {
+    font-size: 32px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Container cho các hộp thông tin */
+.dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+/* Hộp thông tin */
+.info-box {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 250px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+/* Icon trong hộp thông tin */
+.info-box i {
+    font-size: 40px;
+    color: #ff6b81;
+    margin-bottom: 10px;
+}
+
+/* Tiêu đề hộp thông tin */
+.info-box h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Nội dung hộp thông tin */
+.info-box p {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Hiệu ứng hover cho hộp thông tin */
+.info-box:hover {
+    transform: translateY(-5px);
+}

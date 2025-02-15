@@ -1,0 +1,78 @@
+/* Container chính */
+.login-page {
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fbe8e8;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tiêu đề */
+.login-page h2 {
+    color: #ff6b81;
+    margin-bottom: 20px;
+}
+
+/* Input */
+.login-page input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ff6b81;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Nút đăng nhập */
+.login-page button {
+    width: 100%;
+    padding: 10px;
+    background: #ff6b81;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.login-page button:hover {
+    background: #e84118;
+}
+
+/* Đăng nhập bằng Google */
+.google-login-btn {
+    width: 100%;
+    padding: 10px;
+    background: white;
+    color: #ff6b81;
+    border: 1px solid #ff6b81;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.google-login-btn:hover {
+    background: #ff6b81;
+    color: white;
+}
+
+/* Liên kết dưới form */
+.login-page p {
+    margin-top: 10px;
+}
+
+.login-page p a {
+    color: #ff6b81;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-page p a:hover {
+    text-decoration: underline;
+}
