@@ -1,3 +1,4 @@
+/* Container chính */
 .register-page {
     width: 100%;
     max-width: 400px;
@@ -6,20 +7,26 @@
     background: #fbe8e8;
     border-radius: 8px;
     text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Tiêu đề */
 .register-page h2 {
     color: #ff6b81;
+    margin-bottom: 20px;
 }
 
+/* Input */
 .register-page input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ff6b81;
     border-radius: 5px;
+    font-size: 16px;
 }
 
+/* Nút đăng ký */
 .register-page button {
     width: 100%;
     padding: 10px;
@@ -28,12 +35,31 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
 }
 
 .register-page button:hover {
     background: #e84118;
 }
 
+/* Liên kết dưới form */
 .register-page p {
     margin-top: 10px;
+}
+
+.register-page p a {
+    color: #ff6b81;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-page p a:hover {
+    text-decoration: underline;
+}
+
+/* Error message */
+.error-message {
+    color: red;
+    margin-bottom: 10px;
 }
