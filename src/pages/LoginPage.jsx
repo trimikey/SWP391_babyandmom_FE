@@ -20,14 +20,17 @@ const LoginPage = () => {
             return;
         }
 
-        const result = await login(user.email, user.password);
+        // const result = await login(user.email, user.password);
+        const result = await login({ email: user.email, password: user.password });
+
 
         if (result.success) {
-            navigate("/dashboard");
+            navigate("/");
         } else {
             setError(result.message || "Sai email hoặc mật khẩu!");
         }
     };
+    
 
     const handleGoogleLogin = () => {
         alert("Tính năng đăng nhập bằng Google chưa được triển khai.");

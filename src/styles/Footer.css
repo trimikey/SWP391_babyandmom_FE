@@ -1,9 +1,9 @@
 .footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-around;
+   
     background: #2c3e50;
-    color: white;
+    color: rgb(37, 32, 32);
     padding: 20px;
 }
 
@@ -12,14 +12,80 @@
 }
 
 .footer-links ul {
+    display: flex;
+    justify-content: space-around;
     list-style: none;
 }
 
 .footer-links ul li a {
-    color: white;
+    color: rgb(29, 26, 26);
     text-decoration: none;
 }
 
 .footer-links ul li a:hover {
     text-decoration: underline;
+}
+.footer {
+    background-color: #ffebee;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.footer-content h3 {
+    color: #d81b60;
+    margin-bottom: 10px;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #d81b60;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #e91e63;
+}
+
+/* Social Media Icons */
+.footer-social {
+
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+}
+
+
+.social-icon {
+    font-size: 28px;
+    transition: transform 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+.facebook {
+    color: #3b5998;
+}
+
+.zalo {
+    color: #0068ff;
+}
+
+.tiktok {
+    color: #000;
+}
+
+.social-icon:hover {
+    transform: scale(1.2);
 }

@@ -6,28 +6,35 @@ const useAuth = () => {
 
     // Hàm xử lý đăng nhập
     const login = async (credentials) => {
-        setLoading(true);
-        setError("");
+    console.log("Sending credentials:", credentials); // Debug
+    setLoading(true);
+    setError("");
 
-        try {
-            const response = await fetch("http://localhost:8080/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(credentials),
-            });
+    try {
+        const response = await fetch("http://localhost:8080/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(credentials),
+        });
 
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || "Đăng nhập thất bại!");
+        console.log("Response status:", response.status); // Debug
 
-            localStorage.setItem("token", data.token);
-            return { success: true, message: "Đăng nhập thành công!" };
-        } catch (err) {
-            setError(err.message);
-            return { success: false, message: err.message };
-        } finally {
-            setLoading(false);
-        }
-    };
+        const data = await response.json();
+        console.log("Response data:", data); // Debug
+
+        if (!response.ok) throw new Error(data.message || "Đăng nhập thất bại!");
+
+        localStorage.setItem("token", data.token);
+        return { success: true, message: "Đăng nhập thành công!" };
+    } catch (err) {
+        console.error("Login error:", err.message); // Debug
+        setError(err.message);
+        return { success: false, message: err.message };
+    } finally {
+        setLoading(false);
+    }
+};
+    
 
     // Hàm xử lý đăng ký
     const register = async (userData) => {
