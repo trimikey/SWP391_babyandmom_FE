@@ -1,4 +1,3 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { Steps } from 'antd';
 
@@ -13,26 +12,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const description = 'This is a description.'
-const App = () => (
-  <Steps
-    current={1}
-    items={[
-      {
-        title: 'Finished',
-        description,
-      },
-      {
-        title: 'In Progress',
-        description,
-        subTitle: 'Left 00:00:08',
-      },
-      {
-        title: 'Waiting',
-        description,
-      },
-    ]}
-  />
-);
+
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -60,6 +40,10 @@ const RegisterPage = () => {
     {
       title: 'Thông tin cá nhân',
       description: 'Đăng ký tài khoản',
+    },
+    {
+      title: 'Xác nhận thai kỳ',
+      description: 'Tình trạng thai kỳ',
     },
     {
       title: 'Thông tin thai kỳ',
@@ -274,13 +258,64 @@ const RegisterPage = () => {
     navigate('/register', { replace: true });
   };
 
+  const handlePregnancyConfirmation = async (isPregnant) => {
+    if (isPregnant) {
+      setCurrentStep(2); // Chuyển đến form thông tin em bé
+    } else {
+      // Nếu không mang thai, đăng ký tài khoản không có thông tin thai kỳ
+      setIsLoading(true);
+      try {
+        const response = await api.post('register', formData);
+        toast.success('Đăng ký thành công!');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+      } catch (err) {
+        toast.error(err.response?.data || 'Đăng ký thất bại');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const renderPregnancyConfirmation = () => (
+    <div className="mt-8 space-y-6">
+      <div className="text-center">
+        <h3 className="text-lg font-medium text-gray-900">Bạn có đang mang thai không?</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          Thông tin này giúp chúng tôi cung cấp dịch vụ phù hợp nhất cho bạn
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <button
+          onClick={() => handlePregnancyConfirmation(true)}
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+        >
+          Có, tôi đang mang thai
+        </button>
+        <button
+          onClick={() => handlePregnancyConfirmation(false)}
+          className="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+        >
+          Không, tôi chưa mang thai
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <Steps current={currentStep} items={steps} className="mb-8" />
         
         {currentStep === 0 ? (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-8 space-y-6" onSubmit={(e) => {
+            e.preventDefault();
+            if (validateForm()) {
+              setCurrentStep(1);
+            }
+          }}>
             <div className="rounded-md shadow-sm space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -429,6 +464,8 @@ const RegisterPage = () => {
               </button>
             </div>
           </form>
+        ) : currentStep === 1 ? (
+          renderPregnancyConfirmation()
         ) : (
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm space-y-4">

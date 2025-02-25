@@ -55,34 +55,34 @@ const Header = () => {
   return (
     <>
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src={logoImage} alt="Logo" className="h-10 w-10" />
-            <h1 className="text-3xl font-['Alex_Brush'] text-gray-900">Baby&Mom</h1>
-          </div>
+      <header className="bg-white/80 backdrop-blur-sm shadow fixed w-full z-50">
+        <div className="max-w-7xl mx-auto py-2 px-4  flex justify-between items-center">
           <div className="flex items-center space-x-4">
+            <img src={logoImage} alt="Logo" className="h-12 w-12 object-contain" />
+            <h1 className="text-3xl font-['Alex_Brush'] text-gray-900 hover:text-pink-600 transition-colors duration-200">
+              Baby&Mom
+            </h1>
+          </div>
+          <div className="flex items-center space-x-6">
             {!isLoggedIn ? (
-              // Hiển thị nút đăng nhập và đăng ký khi chưa đăng nhập
               <>
                 <button
                   onClick={() => handleNavigation('/login')}
-                  className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium"
+                  className="px-5 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
                 >
                   Đăng nhập
                 </button>
                 <button
                   onClick={() => handleNavigation('/register')}
-                  className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 transition-colors duration-200"
+                  className="px-5 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   Đăng ký
                 </button>
               </>
             ) : (
-              // Hiển thị thông tin user và nút đăng xuất khi đã đăng nhập
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-700">Xin chào,{mail}</span>
+                <div className="flex items-center space-x-3">
+                  <span className="text-gray-700">Xin chào, {mail}</span>
                   <div className="relative">
                     <button
                       onClick={() => setShowDropdown(!showDropdown)}
@@ -120,31 +120,69 @@ const Header = () => {
                       </div>
                     )}
                   </div>
-                  <span className="text-sm text-gray-500">
-                    ({userInfo.role === 'ADMIN' ? 'Admin' : 'Thành viên'})
+                  <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    {userInfo.role === 'ADMIN' ? 'Admin' : 'Thành viên'}
                   </span>
                 </div>
               </div>
             )}
           </div>
         </div>
-      </header>
 
-      {/* Navigation */}
-      <nav>
-        <div className="max-w-7xl mx-auto px-4 flex justify-center h-16">
-          <div className="flex space-x-8">
-            <button onClick={() => handleNavigation('/homepage')} className="text-gray-700 hover:text-pink-900 font-medium">Trang chủ</button>
-            <button onClick={() => handleNavigation('/blog')} className="text-gray-700 hover:text-pink-900 font-medium">Blog</button>
-            <button onClick={() => handleNavigation('/faq')} className="text-gray-700 hover:text-pink-900 font-medium">FAQ</button>
-            <button onClick={() => handleNavigation('/membership')} className="text-gray-700 hover:text-pink-900 font-medium">Gói thành viên</button>
-            {userInfo.role === 'ADMIN' && (
-              <button onClick={() => handleNavigation('/dashboard')} className="text-gray-700 hover:text-pink-900 font-medium">Dashboard</button>
-            )}
-            <button onClick={() => handleNavigation('/growthchart')} className="text-gray-700 hover:text-pink-900 font-medium">Biểu đồ thai</button>
+        {/* Navigation */}
+        <nav className="border-t border-gray-100">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex justify-center space-x-12 h-14">
+              <button 
+                onClick={() => handleNavigation('/homepage')} 
+                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+              >
+                <span>Trang chủ</span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+              </button>
+              <button 
+                onClick={() => handleNavigation('/blog')} 
+                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+              >
+                <span>Blog</span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+              </button>
+              <button 
+                onClick={() => handleNavigation('/faq')} 
+                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+              >
+                <span>FAQ</span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+              </button>
+              <button 
+                onClick={() => handleNavigation('/membership')} 
+                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+              >
+                <span>Gói thành viên</span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+              </button>
+              {userInfo.role === 'ADMIN' && (
+                <button 
+                  onClick={() => handleNavigation('/dashboard')} 
+                  className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+                >
+                  <span>Dashboard</span>
+                  <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+                </button>
+              )}
+              <button 
+                onClick={() => handleNavigation('/growthchart')} 
+                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
+              >
+                <span>Biểu đồ thai</span>
+                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
+              </button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
+      {/* Add padding to account for fixed header */}
+      <div className="h-32"></div>
     </>
   );
 };
