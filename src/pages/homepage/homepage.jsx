@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
 import bannerImage from '../../assets/banner2.jpg';
 import introImage from '../../assets/baby-intro2.jpg';
@@ -7,6 +10,51 @@ import HeaderU from '../../components/Header/HeaderU.jsx';
 import { Link } from 'react-router-dom';
 
 const Homepage = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const checkPregnancyProfile = async () => {
+      try {
+        const response = await api.get('pregnancy-profile');
+        
+        // Nếu chưa có thông tin thai kỳ, hiện thông báo
+        if (!response.data.hasProfile) {
+          Swal.fire({
+            title: 'Thêm thông tin thai kỳ',
+            text: 'Bạn chưa có thông tin thai kỳ. Bạn có muốn thêm thông tin ngay bây giờ không?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#EC4899',
+            cancelButtonColor: '#9CA3AF',
+            confirmButtonText: 'Thêm thông tin',
+            cancelButtonText: 'Để sau',
+            background: '#fff',
+            customClass: {
+              container: 'font-sans',
+              popup: 'rounded-lg',
+              title: 'text-xl text-gray-800 font-semibold',
+              content: 'text-gray-700',
+              confirmButton: 'rounded-lg text-sm font-medium',
+              cancelButton: 'rounded-lg text-sm font-medium'
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate('/profile');
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error checking pregnancy profile:', error);
+      }
+    };
+
+    // Kiểm tra role trước khi gọi API
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    if (userInfo && userInfo.role !== 'ADMIN') {
+      checkPregnancyProfile();
+    }
+  }, []); // Chỉ chạy một lần khi component mount
+
   return (  
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>

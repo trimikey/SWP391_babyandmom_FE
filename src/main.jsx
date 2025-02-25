@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import StudentManagement from "./StudentManagement.jsx";
 import "./index.css";
 import { createBrowserRouter } from "react-router-dom";
 import { RouterProvider } from "react-router";
