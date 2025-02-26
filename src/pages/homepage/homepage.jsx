@@ -13,12 +13,28 @@ const Homepage = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
+    // Kiểm tra thông tin user đã lưu
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const token = localStorage.getItem('token');
+    console.log('Current token:', token); // Kiểm tra token
+
     const checkPregnancyProfile = async () => {
       try {
-        const response = await api.get('pregnancy-profile');
+        // Lấy và hiển thị tên người dùng
+        const name = userInfo.fullName ;
+        console.log('User name:', name);
+
+        const response = await api.get('/pregnancy-profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('API Response:', response.data);
         
         // Nếu chưa có thông tin thai kỳ, hiện thông báo
         if (!response.data.hasProfile) {
+          console.log('No profile found, showing alert...');
           Swal.fire({
             title: 'Thêm thông tin thai kỳ',
             text: 'Bạn chưa có thông tin thai kỳ. Bạn có muốn thêm thông tin ngay bây giờ không?',
@@ -38,22 +54,26 @@ const Homepage = () => {
               cancelButton: 'rounded-lg text-sm font-medium'
             }
           }).then((result) => {
+            console.log('Alert result:', result);
             if (result.isConfirmed) {
+              console.log('Navigating to profile page...');
               navigate('/profile');
             }
           });
+        } else {
+          console.log('Profile exists, no action needed');
         }
       } catch (error) {
-        console.error('Error checking pregnancy profile:', error);
+        console.error('Error in checkPregnancyProfile:', error);
+        console.error('Error response:', error.response);
       }
     };
 
-    // Kiểm tra role trước khi gọi API
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    // Chỉ check profile nếu có userInfo và không phải ADMIN
     if (userInfo && userInfo.role !== 'ADMIN') {
       checkPregnancyProfile();
     }
-  }, []); // Chỉ chạy một lần khi component mount
+  }, []);
 
   return (  
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"

@@ -8,7 +8,7 @@ const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false); // State for dropdown
   const [userInfo, setUserInfo] = useState({
-    name: '',
+    fullName: '',
     email: '',
     role: ''
   });
@@ -24,7 +24,7 @@ const Header = () => {
         console.log('Stored user info:', parsedUserInfo); // Kiểm tra thông tin được lưu
         setIsLoggedIn(true);
         setUserInfo({
-          name: parsedUserInfo.name || parsedUserInfo.email, // Fallback to email if name is not available
+          fullName: parsedUserInfo.fullName || parsedUserInfo.email, // Fallback to email if name is not available
           email: parsedUserInfo.email,
           role: parsedUserInfo.role
         });
@@ -50,7 +50,7 @@ const Header = () => {
     });
     navigate('/login');
   };
-  const mail = localStorage.getItem('email');
+  const name = localStorage.getItem('fullName');
 
   return (
     <>
@@ -82,13 +82,15 @@ const Header = () => {
             ) : (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-3">
-                  <span className="text-gray-700">Xin chào, {mail}</span>
+                  <span className="text-gray-700">
+                    Xin chào, {userInfo.fullName || 'Guest'}
+                  </span>
                   <div className="relative">
                     <button
                       onClick={() => setShowDropdown(!showDropdown)}
                       className="flex items-center space-x-1 font-medium text-pink-600 hover:text-pink-700"
                     >
-                      <span>{userInfo.name}</span>
+                      <span>{userInfo.fullName}</span>
                       <FaCaretDown className={`transform transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                     </button>
                     

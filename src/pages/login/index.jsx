@@ -10,6 +10,7 @@ const LoginPage = () => {
     email: "",
     password: "",
     rememberMe: false,
+    name:""
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +46,7 @@ const LoginPage = () => {
 
         // Lấy accessToken và thông tin từ response
         const { accessToken, message, role, email, name } = response.data;
-      
+        console.log()
         if (accessToken) {  
           // Lưu token và thông tin user vào localStorage
           localStorage.setItem('token', accessToken);
@@ -61,6 +62,9 @@ const LoginPage = () => {
           toast.success(message || 'Đăng nhập thành công!');
           const token = jwtDecode(response.data.accessToken)
           localStorage.setItem('email', token.sub)
+          localStorage.setItem('accessToken', token)
+          localStorage.setItem('name', token.name)
+          
           console.log(token)
           // Điều hướng dựa trên role
           if (role === 'ADMIN') {

@@ -14,8 +14,7 @@ api.interceptors.request.use(
     },
     function (error) {
       console.log(error);
-      return Promise.reject(error);
-      
+      console.log('token', token)      
     }
   );
 

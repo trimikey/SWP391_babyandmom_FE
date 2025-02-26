@@ -14,11 +14,14 @@ import Membership from "./pages/membership/Membership.jsx"
 import PregnancyCare from "./pages/homepage/pregnancy-care.jsx"
 import ParentingEducation from "./pages/homepage/parenting-education.jsx"
 import Profile from "./pages/profiles/profile.jsx";
+import FAQManagement from './pages/admin/FAQManagement.jsx';
+
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
 
 const router = createBrowserRouter([
+  
   {
     path:"/Profile",
     element: <Profile/>
@@ -69,6 +72,11 @@ const router = createBrowserRouter([
         path: "/dashboard/user",
         element: <ManageUser/>
       },
+      {
+        path: '/dashboard/faq',
+        element: <FAQManagement />,
+      },
+      
 
     ]
   },

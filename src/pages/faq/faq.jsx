@@ -6,7 +6,6 @@ import { SiZalo } from 'react-icons/si';
 import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
 import logo from '../../assets/logo.jpg';
-import { faqData } from '../../data/faqData';
 import Footer from '../../components/Footer/Footer.jsx';
 import HeaderU from '../../components/Header/HeaderU.jsx';
 const { Panel } = Collapse;
@@ -20,9 +19,24 @@ const FaqPage = () => {
     navigate(path);
   };
 
+  // Fetch FAQs from API
+  const fetchFAQs = async () => {
+    try {
+      const response = await api.get('faqs');
+      // Sắp xếp FAQ theo displayOrder
+      const sortedFaqs = response.data.sort((a, b) => a.displayOrder - b.displayOrder);
+      // Lọc chỉ lấy các FAQ đang active
+      const activeFaqs = sortedFaqs.filter(faq => faq.isActive);
+      setFaqs(activeFaqs);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching FAQs:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setFaqs(faqData);
-    setLoading(false);
+    fetchFAQs();
   }, []);
 
   return (
@@ -56,9 +70,9 @@ const FaqPage = () => {
               defaultActiveKey={['0']} 
               className="bg-white rounded-lg shadow-lg"
             >
-              {faqs.map((faq, index) => (
+              {faqs.map((faq) => (
                 <Panel 
-                  key={index}
+                  key={faq.id}
                   header={
                     <div className="text-lg font-medium text-gray-800">
                       {faq.name}
@@ -73,6 +87,13 @@ const FaqPage = () => {
                 </Panel>
               ))}
             </Collapse>
+          )}
+
+          {/* Hiển thị thông báo nếu không có FAQ */}
+          {!loading && faqs.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Hiện tại chưa có câu hỏi thường gặp nào.</p>
+            </div>
           )}
 
           {/* Phần liên hệ hỗ trợ */}
