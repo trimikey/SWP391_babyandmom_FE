@@ -5,8 +5,7 @@ import { RouterProvider } from "react-router";
 import LoginPage from "./pages/login/index.jsx";
 import RegisterPage from "./pages/register/index.jsx";
 import { ToastContainer } from "react-toastify";
-import AdminLayout from "./components/layouts/adminLayout.jsx";
-import ManageProduct from "./pages/admin/manage-product.jsx";
+import AdminLayout from "./components/layout/adminLayout.jsx";
 import ManageUser from "./pages/admin/manage-user.jsx";
 import HomePage from "./pages/homepage/homepage.jsx";
 import FAQ from "./pages/faq/faq.jsx"
@@ -18,7 +17,9 @@ import FAQManagement from './pages/admin/FAQManagement.jsx';
 import MembershipPackages from './pages/admin/MembershipPackages.jsx';
 import MainLayout from "./components/layout/MainLayout.jsx";
 import PregnancyProfile from "./pages/profiles/PregnancyProfile.jsx";
-
+import BlogManagement from "./pages/admin/BlogManagement.jsx";
+import Blog from "./pages/blog/Blog.jsx";
+import ForgotPassword from "./pages/login/ForgotPassword.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -28,7 +29,10 @@ const router = createBrowserRouter([
     path:"",
     element: <MainLayout/>,
     children: [
-      
+      {
+        path: "/blog",
+        element: <Blog/>,
+      },
       {
         path: "/",
         element: <HomePage/>,
@@ -79,12 +83,8 @@ const router = createBrowserRouter([
 
   // ... 
   {
-    path:"/faq",
-    element: <FAQ/>
-  },
-  {
-    path: "/membership",
-    element: <Membership/>
+    path: "/forgot-password",
+    element: <ForgotPassword/>
   },
   {
     path: "/login",
@@ -102,10 +102,7 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: <AdminLayout/>,
     children:[
-      {
-        path: "/dashboard/product",
-        element: <ManageProduct/>
-      },
+      
       {
         path: "/dashboard/user",
         element: <ManageUser/>
@@ -114,10 +111,14 @@ const router = createBrowserRouter([
         path: '/dashboard/faq',
         element: <FAQManagement />,
       },
-      {
-        path: '/dashboard/membership',
-        element: <MembershipPackages />,
-      },
+        {
+          path: '/dashboard/membership',
+          element: <MembershipPackages />,
+        },
+        {
+          path: '/dashboard/blog',
+          element: <BlogManagement />,
+        },
       
 
     ]

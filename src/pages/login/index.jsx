@@ -2,9 +2,10 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import logoImage from '../../assets/logo1.jpg';
 import { jwtDecode } from "jwt-decode";
+
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -203,9 +204,9 @@ const LoginPage = () => {
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-purple-600 hover:text-purple-500">
+              <Link to="/forgot-password" className="font-medium text-purple-600 hover:text-purple-500">
                 Quên mật khẩu?
-              </a>
+              </Link>
             </div>
           </div>
 

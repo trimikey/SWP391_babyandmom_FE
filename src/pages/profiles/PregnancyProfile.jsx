@@ -55,6 +55,7 @@ const PregnancyProfile = () => {
       title: 'Kỳ kinh cuối',
       dataIndex: 'lastPeriod',
       key: 'lastPeriod',
+      render: (date) => moment(date).format('DD/MM/YYYY'),
     },
     {
       title: 'Chiều cao (cm)',
@@ -90,11 +91,18 @@ const PregnancyProfile = () => {
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
+      // Convert dates to ISO string format
+      const formattedValues = {
+        ...values,
+        dueDate: values.dueDate.toISOString(),
+        lastPeriod: values.lastPeriod.toISOString(),
+      };
+
       if (editingId) {
-        await pregnancyProfileApi.updateProfile(editingId, values);
+        await pregnancyProfileApi.updateProfile(editingId, formattedValues);
         message.success('Cập nhật thông tin thành công');
       } else {
-        await pregnancyProfileApi.createProfile(values);
+        await pregnancyProfileApi.createProfile(formattedValues);
         message.success('Thêm thông tin thành công');
       }
       setIsModalVisible(false);
@@ -113,6 +121,7 @@ const PregnancyProfile = () => {
     form.setFieldsValue({
       ...record,
       dueDate: moment(record.dueDate),
+      lastPeriod: moment(record.lastPeriod),
     });
     setIsModalVisible(true);
   };
@@ -186,7 +195,10 @@ const PregnancyProfile = () => {
             label="Ngày dự sinh"
             rules={[{ required: true, message: 'Vui lòng chọn ngày dự sinh' }]}
           >
-            <DatePicker style={{ width: '100%' }} />
+            <DatePicker 
+              style={{ width: '100%' }} 
+              format="DD/MM/YYYY"
+            />
           </Form.Item>
 
           <Form.Item
@@ -200,9 +212,12 @@ const PregnancyProfile = () => {
           <Form.Item
             name="lastPeriod"
             label="Kỳ kinh cuối"
-            rules={[{ required: true, message: 'Vui lòng nhập kỳ kinh cuối' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn kỳ kinh cuối' }]}
           >
-            <Input />
+            <DatePicker 
+              style={{ width: '100%' }} 
+              format="DD/MM/YYYY"
+            />
           </Form.Item>
 
           <Form.Item

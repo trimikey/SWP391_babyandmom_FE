@@ -111,7 +111,7 @@ const Header = () => {
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
                       >
                         <FaUser className="text-pink-500" />
-                        <span>Thông tin cá nhân</span>
+                        <span>Thông tin thai kì</span>
                       </button>
 
                       <button

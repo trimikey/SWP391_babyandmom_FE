@@ -8,7 +8,7 @@ const userApi = {
 
     // Get user by ID
     getUserById: (id) => {
-        return api.get(`/users/${id}`);
+        return api.get(`getProfile/${id}`);
     },
 
     // Login

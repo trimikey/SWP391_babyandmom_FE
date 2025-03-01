@@ -13,10 +13,10 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem("overview", "overview", <PieChartOutlined />),
   getItem("user", "user", <DesktopOutlined />),
   getItem("faq", "faq", <DesktopOutlined />),
   getItem("membership", "membership", <DesktopOutlined />),
+  getItem("blog", "blog", <DesktopOutlined />),
   //   getItem("User", "sub1", <UserOutlined />, [
   //     getItem("Tom", "3"),
   //     getItem("Bill", "4"),
