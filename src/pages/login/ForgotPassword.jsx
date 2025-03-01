@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import api from '../../config/axios';
+import backgroundImage from '../../assets/background.jpg';
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -50,8 +51,9 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+<div className="min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${backgroundImage})` }}>   
+         <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {codeSent ? 'Đặt lại mật khẩu' : 'Quên mật khẩu'}
