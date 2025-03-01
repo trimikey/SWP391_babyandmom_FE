@@ -4,7 +4,7 @@ import { SiZalo } from 'react-icons/si';
 
 const Footer = () => {
   return (
-    <footer className="bg-white-100/90 text-black py-8 mt-12">
+    <footer className="bg-white-100/30 text-black py-2 mt-6">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Copyright */}

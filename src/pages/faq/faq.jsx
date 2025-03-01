@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { FaFacebook, FaTiktok, FaEnvelope } from 'react-icons/fa';
-import { SiZalo } from 'react-icons/si';
 import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
-import logo from '../../assets/logo.jpg';
-import Footer from '../../components/Footer/Footer.jsx';
-import HeaderU from '../../components/Header/HeaderU.jsx';
+
 const { Panel } = Collapse;
 
 const FaqPage = () => {
@@ -40,13 +36,9 @@ const FaqPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundColor: 'rgba(255, 182, 193, 0.8)',
-      }}>
+    <div className="min-h-screen bg-cover bg-center bg-no-repeat"
+    style={{ backgroundImage: `url(${backgroundImage})` }}>
       {/* Header & Navigation */}
-      <HeaderU />
 
 
       {/* Main Content - thêm background màu trắng trong suốt */}
@@ -131,7 +123,6 @@ const FaqPage = () => {
       </main>
 
       {/* Footer */}
-      <Footer />
     </div>
   );
 };

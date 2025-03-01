@@ -1,5 +1,4 @@
 import api from '../config/axios';
-import faqApi from '../../api/api.faq';
 
 const faqApi = {
     // Lấy tất cả FAQ

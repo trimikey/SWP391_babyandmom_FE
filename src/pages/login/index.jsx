@@ -70,7 +70,7 @@ const LoginPage = () => {
           if (role === 'ADMIN') {
             navigate('/dashboard');
           } else {
-            navigate('/homepage');
+            navigate('/');
           }
         }
 

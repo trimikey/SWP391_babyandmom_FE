@@ -13,15 +13,56 @@ import FAQ from "./pages/faq/faq.jsx"
 import Membership from "./pages/membership/Membership.jsx"
 import PregnancyCare from "./pages/homepage/pregnancy-care.jsx"
 import ParentingEducation from "./pages/homepage/parenting-education.jsx"
-import Profile from "./pages/profiles/profile.jsx";
+import Profile from "./pages/profiles/Profile.jsx";
 import FAQManagement from './pages/admin/FAQManagement.jsx';
+import MembershipPackages from './pages/admin/MembershipPackages.jsx';
+import MainLayout from "./components/layout/MainLayout.jsx";
+import PregnancyProfile from "./pages/profiles/PregnancyProfile.jsx";
 
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
 
 const router = createBrowserRouter([
-  
+  {
+    path:"",
+    element: <MainLayout/>,
+    children: [
+      
+      {
+        path: "/",
+        element: <HomePage/>,
+      },
+      {
+        path:"/Profile",
+        element: <Profile/>
+      },
+      {
+        path:"/Profile/pregnancy-profile",
+        element: <PregnancyProfile/>
+      },
+      {path:"/pregnancy-care",
+        element: <PregnancyCare/>
+    
+      },
+      {path:"/parenting-education",
+        element: <ParentingEducation/>
+    
+      },
+     
+    
+      // ... 
+      {
+        path:"/faq",
+        element: <FAQ/>
+      },
+      {
+        path: "/membership",
+        element: <Membership/>
+      },
+      
+    ]
+  },
   {
     path:"/Profile",
     element: <Profile/>
@@ -34,10 +75,7 @@ const router = createBrowserRouter([
     element: <ParentingEducation/>
 
   },
-  {
-    path: "/",
-    element: <HomePage/>,
-  },
+ 
 
   // ... 
   {
@@ -75,6 +113,10 @@ const router = createBrowserRouter([
       {
         path: '/dashboard/faq',
         element: <FAQManagement />,
+      },
+      {
+        path: '/dashboard/membership',
+        element: <MembershipPackages />,
       },
       
 

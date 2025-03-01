@@ -5,9 +5,9 @@ import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
 import bannerImage from '../../assets/banner2.jpg';
 import introImage from '../../assets/baby-intro2.jpg';
-import Footer from '../../components/Footer/Footer.jsx';
-import HeaderU from '../../components/Header/HeaderU.jsx';
 import { Link } from 'react-router-dom';
+
+
 
 const Homepage = () => {
   const navigate = useNavigate();
@@ -16,25 +16,21 @@ const Homepage = () => {
     // Kiểm tra thông tin user đã lưu
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const token = localStorage.getItem('token');
-    console.log('Current token:', token); // Kiểm tra token
+    // console.log('Current token:', token); // Kiểm tra token
 
     const checkPregnancyProfile = async () => {
       try {
         // Lấy và hiển thị tên người dùng
-        const name = userInfo.fullName ;
-        console.log('User name:', name);
-
+        
         const response = await api.get('/pregnancy-profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        console.log('API Response:', response.data);
         
         // Nếu chưa có thông tin thai kỳ, hiện thông báo
         if (!response.data.hasProfile) {
-          console.log('No profile found, showing alert...');
           Swal.fire({
             title: 'Thêm thông tin thai kỳ',
             text: 'Bạn chưa có thông tin thai kỳ. Bạn có muốn thêm thông tin ngay bây giờ không?',
@@ -76,11 +72,9 @@ const Homepage = () => {
   }, []);
 
   return (  
+    
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>
-      
-      <HeaderU />
-
       {/* Main Content */}
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4">
@@ -141,7 +135,6 @@ const Homepage = () => {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 };
