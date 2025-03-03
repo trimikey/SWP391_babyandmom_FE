@@ -360,7 +360,7 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
             >
               {isLoading ? "Đang xử lý..." : "Đăng ký"}
             </button>
@@ -370,7 +370,7 @@ const RegisterPage = () => {
             <p className="mr-2">Bạn đã có tài khoản?</p>
             <button
               onClick={handleNavigateLogin}
-              className="text-sm text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="text-pink-400 hover:text-pink-500 font-medium"
             >
               Đăng nhập
             </button>

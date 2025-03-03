@@ -16,12 +16,9 @@ const Homepage = () => {
     // Kiểm tra thông tin user đã lưu
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const token = localStorage.getItem('token');
-    // console.log('Current token:', token); // Kiểm tra token
 
     const checkPregnancyProfile = async () => {
       try {
-        // Lấy và hiển thị tên người dùng
-        
         const response = await api.get('/pregnancy-profile', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -29,8 +26,8 @@ const Homepage = () => {
           }
         });
         
-        // Nếu chưa có thông tin thai kỳ, hiện thông báo
-        if (!response.data.hasProfile) {
+        // Chỉ hiện thông báo nếu chưa có thông tin thai kỳ và hasProfile là false
+        if (response.data && response.data.hasProfile === false) {
           Swal.fire({
             title: 'Thêm thông tin thai kỳ',
             text: 'Bạn chưa có thông tin thai kỳ. Bạn có muốn thêm thông tin ngay bây giờ không?',
@@ -50,18 +47,13 @@ const Homepage = () => {
               cancelButton: 'rounded-lg text-sm font-medium'
             }
           }).then((result) => {
-            console.log('Alert result:', result);
             if (result.isConfirmed) {
-              console.log('Navigating to profile page...');
               navigate('/profile');
             }
           });
-        } else {
-          console.log('Profile exists, no action needed');
         }
       } catch (error) {
         console.error('Error in checkPregnancyProfile:', error);
-        console.error('Error response:', error.response);
       }
     };
 
@@ -69,7 +61,7 @@ const Homepage = () => {
     if (userInfo && userInfo.role !== 'ADMIN') {
       checkPregnancyProfile();
     }
-  }, []);
+  }, [navigate]);
 
   return (  
     

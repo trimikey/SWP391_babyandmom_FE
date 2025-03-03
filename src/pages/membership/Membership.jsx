@@ -26,12 +26,16 @@ const Membership = () => {
     }
   };
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
-  const handleSubscribe = (packageId) => {
-    navigate('/payment', { state: { packageId } });
+  const handleSubscribe = (pkg) => {
+    navigate('/payment', { 
+      state: { 
+        packageId: pkg.id,
+        packageType: pkg.type,
+        packagePrice: pkg.price,
+        packageDuration: pkg.durationInMonths,
+        packageName: `Gói ${pkg.durationInMonths} tháng`
+      } 
+    });
   };
 
   const formatPrice = (price) => {
@@ -39,10 +43,6 @@ const Membership = () => {
       style: 'currency',
       currency: 'VND'
     }).format(price);
-  };
-
-  const getDurationText = (months) => {
-    return months === -1 ? 'Trọn đời' : '1 năm';
   };
 
   return (
@@ -65,28 +65,20 @@ const Membership = () => {
             <Spin size="large" />
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {packages.map((pkg) => (
               <div key={pkg.id} 
-                className={`bg-white/90 backdrop-blur-sm rounded-lg shadow-xl p-8 
-                  ${pkg.type === 'LIFETIME' ? 'border-2 border-pink-500' : ''}`}>
+                className="bg-white/90 backdrop-blur-sm rounded-lg shadow-xl p-8">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                    {pkg.type === 'YEARLY' && 'Gói Hàng Năm'}
-                    {pkg.type === 'LIFETIME' && 'Gói Trọn Đời'}
+                    Gói {pkg.durationInMonths} tháng
                   </h3>
-                  {pkg.type === 'LIFETIME' && (
-                    <span className="bg-pink-500 text-white px-3 py-1 rounded-full text-sm">
-                      Được ưa chuộng
-                    </span>
-                  )}
                 </div>
 
                 <div className="mt-6 text-center">
                   <span className="text-4xl font-bold text-gray-900">
                     {formatPrice(pkg.price)}
                   </span>
-                  <span className="text-gray-600">/{getDurationText(pkg.durationInMonths)}</span>
                 </div>
 
                 <div className="mt-8">
@@ -103,12 +95,9 @@ const Membership = () => {
                 </div>
 
                 <button
-                  onClick={() => handleSubscribe(pkg.id)}
-                  className={`mt-8 w-full py-3 px-6 rounded-lg text-white font-semibold
-                    ${pkg.type === 'LIFETIME' 
-                      ? 'bg-pink-500 hover:bg-pink-600' 
-                      : 'bg-gray-800 hover:bg-gray-900'} 
-                    transition-colors duration-200`}
+                  onClick={() => handleSubscribe(pkg)}
+                  className="mt-8 w-full py-3 px-6 rounded-lg text-white font-semibold
+                    bg-pink-500 hover:bg-pink-600 transition-colors duration-200"
                 >
                   Đăng ký ngay
                 </button>
