@@ -1,113 +1,111 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, DatePicker, InputNumber, Button, message, Table, Space, Modal } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card } from 'antd';
 import pregnancyProfileApi from '../services/api.pregnancyProfile';
 import moment from 'moment';
 
 const { Option } = Select;
 
 const PregnancyProfile = () => {
-  const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [profile, setProfile] = useState(null);
   const [form] = Form.useForm();
-  const [editingId, setEditingId] = useState(null);
 
-  // Fetch profiles
-  const fetchProfiles = async () => {
+  // Tính ngày dự sinh (kỳ kinh cuối + 9 tháng 10 ngày)
+  const calculateDueDate = (lastPeriodDate) => {
+    if (!lastPeriodDate) return null;
+    return moment(lastPeriodDate).add(9, 'months').add(10, 'days');
+  };
+
+  // Tính tuần thai từ kỳ kinh cuối
+  const calculateCurrentWeek = (lastPeriodDate) => {
+    if (!lastPeriodDate) return null;
+    const days = moment().diff(moment(lastPeriodDate), 'days');
+    const weeks = Math.floor(days / 7) + 1;
+    return weeks;
+  };
+
+  // Xử lý khi thay đổi ngày kỳ kinh cuối
+  const handleLastPeriodChange = (date) => {
+    if (date) {
+      const dueDate = calculateDueDate(date);
+      const currentWeek = calculateCurrentWeek(date);
+      
+      if (currentWeek > 45) {
+        message.error('Kỳ kinh cuối không hợp lệ. Tuần thai không thể vượt quá 45 tuần. Vui lòng chọn lại ngày.');
+        form.setFieldsValue({
+          lastPeriod: null,
+          dueDate: null,
+          currentWeek: null
+        });
+        return;
+      }
+
+      form.setFieldsValue({
+        dueDate: dueDate,
+        currentWeek: currentWeek
+      });
+    } else {
+      form.setFieldsValue({
+        dueDate: null,
+        currentWeek: null
+      });
+    }
+  };
+
+  // Theo dõi sự thay đổi của form
+  useEffect(() => {
+    // Đăng ký theo dõi sự thay đổi của trường lastPeriod
+    const { lastPeriod } = form.getFieldsValue();
+    if (lastPeriod) {
+      handleLastPeriodChange(lastPeriod);
+    }
+  }, [form.getFieldValue('lastPeriod')]);
+
+  // Fetch profile
+  const fetchProfile = async () => {
     try {
+      setLoading(true);
       const data = await pregnancyProfileApi.getAllProfiles();
-      setProfiles(data);
+      if (data && data.length > 0) {
+        setProfile(data[0]);
+        form.setFieldsValue({
+          babyName: data[0].babyName,
+          babyGender: data[0].babyGender,
+          dueDate: moment(data[0].dueDate),
+          currentWeek: data[0].currentWeek,
+          lastPeriod: moment(data[0].lastPeriod),
+          height: data[0].height
+        });
+      }
     } catch (error) {
       message.error('Không thể tải thông tin thai kỳ');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProfiles();
+    fetchProfile();
   }, []);
 
-  // Table columns
-  const columns = [
-    {
-      title: 'Tên em bé',
-      dataIndex: 'babyName',
-      key: 'babyName',
-    },
-    {
-      title: 'Giới tính',
-      dataIndex: 'babyGender',
-      key: 'babyGender',
-      render: (gender) => gender === 'MALE' ? 'Nam' : 'Nữ',
-    },
-    {
-      title: 'Ngày dự sinh',
-      dataIndex: 'dueDate',
-      key: 'dueDate',
-      render: (date) => moment(date).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Tuần thai',
-      dataIndex: 'currentWeek',
-      key: 'currentWeek',
-    },
-    {
-      title: 'Kỳ kinh cuối',
-      dataIndex: 'lastPeriod',
-      key: 'lastPeriod',
-      render: (date) => moment(date).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Chiều cao (cm)',
-      dataIndex: 'height',
-      key: 'height',
-    },
-    {
-      title: 'Thao tác',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <Button 
-            type="primary" 
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            Sửa
-          </Button>
-          <Button 
-            type="primary" 
-            danger 
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-          >
-            Xóa
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
-  // Handle create/edit
+  // Handle submit
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      // Convert dates to ISO string format
       const formattedValues = {
         ...values,
         dueDate: values.dueDate.toISOString(),
         lastPeriod: values.lastPeriod.toISOString(),
       };
 
-      if (editingId) {
-        await pregnancyProfileApi.updateProfile(editingId, formattedValues);
+      if (profile?.id) {
+        await pregnancyProfileApi.updateProfile(profile.id, formattedValues);
         message.success('Cập nhật thông tin thành công');
       } else {
         await pregnancyProfileApi.createProfile(formattedValues);
         message.success('Thêm thông tin thành công');
       }
-      setIsModalVisible(false);
-      form.resetFields();
-      fetchProfiles();
+      fetchProfile();
     } catch (error) {
       message.error('Có lỗi xảy ra');
     } finally {
@@ -115,131 +113,143 @@ const PregnancyProfile = () => {
     }
   };
 
-  // Handle edit
-  const handleEdit = (record) => {
-    setEditingId(record.id);
-    form.setFieldsValue({
-      ...record,
-      dueDate: moment(record.dueDate),
-      lastPeriod: moment(record.lastPeriod),
-    });
-    setIsModalVisible(true);
-  };
-
-  // Handle delete
-  const handleDelete = async (id) => {
-    try {
-      await pregnancyProfileApi.deleteProfile(id);
-      message.success('Xóa thông tin thành công');
-      fetchProfiles();
-    } catch (error) {
-      message.error('Có lỗi xảy ra khi xóa');
-    }
-  };
-
   return (
-    <div className="p-6">
-      <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-semibold">Thông Tin Thai Kỳ</h1>
-        <Button 
-          type="primary"
-          onClick={() => {
-            setEditingId(null);
-            form.resetFields();
-            setIsModalVisible(true);
-          }}
-        >
-          Thêm Mới
-        </Button>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <style jsx>{`
+        .ant-picker-header-view {
+          color: #000000 !important;
+          pointer-events: none !important;
+        }
+        .ant-picker-content th {
+          color: #000000 !important;
+        }
+        .ant-picker-cell {
+          color: #000000 !important;
+        }
+        .ant-picker-cell-disabled {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+        .ant-picker-super-prev-icon::after,
+        .ant-picker-super-next-icon::after,
+        .ant-picker-prev-icon::after,
+        .ant-picker-next-icon::after {
+          border-color: #000000 !important;
+        }
+        .ant-picker-header-super-prev-btn,
+        .ant-picker-header-super-next-btn {
+          display: none !important;
+        }
+        .ant-picker-decade-panel,
+        .ant-picker-year-panel {
+          display: none !important;
+        }
+      `}</style>
+      <div className="max-w-3xl mx-auto">
+        <Card className="shadow-lg rounded-lg">
+          <h1 className="text-2xl font-semibold text-pink-600 mb-6 text-center">
+            Thông Tin Thai Kỳ
+          </h1>
+
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            className="space-y-4"
+            onValuesChange={(changedValues) => {
+              if (changedValues.lastPeriod) {
+                handleLastPeriodChange(changedValues.lastPeriod);
+              }
+            }}
+          >
+            <Form.Item
+              name="babyName"
+              label="Tên em bé"
+              rules={[{ required: true, message: 'Vui lòng nhập tên em bé' }]}
+            >
+              <Input placeholder="Nhập tên em bé" className="rounded-lg" />
+            </Form.Item>
+
+            <Form.Item
+              name="babyGender"
+              label="Giới tính"
+              rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+            >
+              <Select placeholder="Chọn giới tính" className="rounded-lg">
+                <Option value="MALE">Nam</Option>
+                <Option value="FEMALE">Nữ</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="lastPeriod"
+              label="Kỳ kinh cuối"
+              rules={[{ required: true, message: 'Vui lòng chọn kỳ kinh cuối' }]}
+            >
+              <DatePicker 
+                className="w-full rounded-lg" 
+                format="DD/MM/YYYY"
+                placeholder="Chọn ngày kỳ kinh cuối"
+                onChange={handleLastPeriodChange}
+                disabledDate={(current) => {
+                  // Không cho phép chọn ngày trong tương lai
+                  return current && current > moment().endOf('day');
+                }}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="dueDate"
+              label="Ngày dự sinh "
+            >
+              <DatePicker 
+                className="w-full rounded-lg" 
+                format="DD/MM/YYYY"
+                disabled
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="currentWeek"
+              label="Tuần thai (tự động tính từ kỳ kinh cuối)"
+            >
+              <InputNumber 
+                className="w-full rounded-lg"
+                disabled
+                min={0}
+                max={45}
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="height"
+              label="Chiều dài (cm)"
+              rules={[
+                { required: true, message: 'Vui lòng nhập chiều dài' },
+                { type: 'number', min: 0.1, message: 'Chiều dài phải lớn hơn 0' }
+              ]}
+            >
+              <InputNumber 
+                className="w-full rounded-lg"
+                placeholder="Nhập chiều dài" 
+                step={0.1}
+                precision={1} // Cho phép 1 số thập phân
+                min={0.1}
+              />
+            </Form.Item>
+
+            <Form.Item className="text-center">
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+                className="bg-pink-600 hover:bg-pink-700 border-pink-600 rounded-lg px-8"
+              >
+                {profile ? 'Cập nhật' : 'Thêm mới'}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
       </div>
-
-      <Table 
-        columns={columns} 
-        dataSource={profiles}
-        rowKey="id"
-        loading={loading}
-      />
-
-      <Modal
-        title={editingId ? "Cập nhật thông tin thai kỳ" : "Thêm thông tin thai kỳ"}
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-          <Form.Item
-            name="babyName"
-            label="Tên em bé"
-            rules={[{ required: true, message: 'Vui lòng nhập tên em bé' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            name="babyGender"
-            label="Giới tính"
-            rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
-          >
-            <Select>
-              <Option value="MALE">Nam</Option>
-              <Option value="FEMALE">Nữ</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="dueDate"
-            label="Ngày dự sinh"
-            rules={[{ required: true, message: 'Vui lòng chọn ngày dự sinh' }]}
-          >
-            <DatePicker 
-              style={{ width: '100%' }} 
-              format="DD/MM/YYYY"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="currentWeek"
-            label="Tuần thai"
-            rules={[{ required: true, message: 'Vui lòng nhập tuần thai' }]}
-          >
-            <InputNumber min={1} max={42} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="lastPeriod"
-            label="Kỳ kinh cuối"
-            rules={[{ required: true, message: 'Vui lòng chọn kỳ kinh cuối' }]}
-          >
-            <DatePicker 
-              style={{ width: '100%' }} 
-              format="DD/MM/YYYY"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="height"
-            label="Chiều cao (cm)"
-            rules={[{ required: true, message: 'Vui lòng nhập chiều cao' }]}
-          >
-            <InputNumber min={0.1} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item className="text-right">
-            <Space>
-              <Button onClick={() => setIsModalVisible(false)}>
-                Hủy
-              </Button>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                {editingId ? 'Cập nhật' : 'Thêm mới'}
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

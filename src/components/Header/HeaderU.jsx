@@ -1,34 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import api from '../../config/axios';
 import logoImage from '../../assets/logo.jpg';
-import { FaUser, FaKey, FaBaby, FaSignOutAlt, FaCaretDown } from 'react-icons/fa'; // Import icons
+import { 
+  FaUser, 
+  FaKey, 
+  FaSignOutAlt, 
+  FaCaretDown, 
+  FaUserCircle, // Icon thông tin cá nhân
+  FaBabyCarriage // Icon thông tin thai kỳ
+} from 'react-icons/fa';
+import { MdPregnantWoman } from 'react-icons/md'; // Icon bà bầu từ Material Design icons
 
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false); // State for dropdown
   const [userName, setUserName] = useState('');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // Kiểm tra token và thông tin user từ localStorage
-    const token = localStorage.getItem('token');
-    const userInfoStr = localStorage.getItem('userInfo');
-    console.log('userInfoStr:', userInfoStr);
-    if (token && userInfoStr) {
+    const fetchUserProfile = async () => {
       try {
-        const userInfo = JSON.parse(userInfoStr);
-        console.log('Parsed userInfo:', userInfo); // Debug log
+        const response = await api.get('/password/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
-        // Thứ tự ưu tiên: name -> fullName -> email
-        const displayName = userInfo.name || userInfo.fullName || userInfo.email || 'Guest';
-        setUserName(displayName);
-        setIsLoggedIn(true);
+        if (response.data) {
+          setUserName(response.data.name || 'Guest');
+          setIsLoggedIn(true);
+        }
       } catch (error) {
-        console.error('Error parsing userInfo:', error);
+        console.error('Error fetching user profile:', error);
         setUserName('Guest');
+        if (error.response?.status === 401) {
+          // Token hết hạn hoặc không hợp lệ
+          localStorage.removeItem('token');
+          localStorage.removeItem('userInfo');
+          setIsLoggedIn(false);
+        }
       }
+    };
+
+    if (token) {
+      fetchUserProfile();
+    } else {
+      setIsLoggedIn(false);
+      setUserName('Guest');
     }
-  }, []);
+  }, [token]);
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -36,7 +58,6 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    // Xóa token và thông tin user
     localStorage.removeItem('token');
     localStorage.removeItem('userInfo');
     setIsLoggedIn(false);
@@ -59,13 +80,13 @@ const Header = () => {
             {!isLoggedIn ? (
               <>
                 <button
-                  onClick={() => handleNavigation('/login')}
+                  onClick={() => navigate('/login')}
                   className="px-5 py-2 text-gray-700 hover:text-pink-600 font-medium transition-colors duration-200"
                 >
                   Đăng nhập
                 </button>
                 <button
-                  onClick={() => handleNavigation('/register')}
+                  onClick={() => navigate('/register')}
                   className="px-5 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   Đăng ký
@@ -77,7 +98,7 @@ const Header = () => {
                   onClick={() => setShowDropdown(!showDropdown)}
                   className="flex items-center space-x-2 text-gray-700 hover:text-pink-600"
                 >
-                  <FaUser className="text-lg" />
+                  <FaUserCircle className="text-lg" />
                   <span>{userName}</span>
                   <FaCaretDown className={`transform transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
@@ -99,8 +120,8 @@ const Header = () => {
                         }}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
                       >
-                        <FaBaby className="text-pink-500" />
-                        <span>Thông tin mẹ và bé</span>
+                        <FaUserCircle className="text-pink-500" />
+                        <span>Thông tin cá nhân</span>
                       </button>
 
                       <button
@@ -110,13 +131,13 @@ const Header = () => {
                         }}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
                       >
-                        <FaUser className="text-pink-500" />
-                        <span>Thông tin thai kì</span>
+                        <MdPregnantWoman className="text-pink-500" />
+                        <span>Thông tin thai kỳ</span>
                       </button>
 
                       <button
                         onClick={() => {
-                          handleNavigation('/profile');
+                          handleNavigation('/change-password');
                           setShowDropdown(false);
                         }}
                         className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"

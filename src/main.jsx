@@ -20,6 +20,9 @@ import PregnancyProfile from "./pages/profiles/PregnancyProfile.jsx";
 import BlogManagement from "./pages/admin/BlogManagement.jsx";
 import Blog from "./pages/blog/Blog.jsx";
 import ForgotPassword from "./pages/login/ForgotPassword.jsx";
+import ChangePassword from "./pages/profiles/ChangePassword.jsx";
+import PaymentCallback from "./pages/membership/PaymentCallback.jsx";
+import Payment from "./pages/membership/Payment.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -53,7 +56,15 @@ const router = createBrowserRouter([
         element: <ParentingEducation/>
     
       },
-     
+      {
+        path: "/payment-callback",
+        element: <PaymentCallback/>
+      },
+      {
+        path: "/payment",
+        element: <Payment/>
+      },
+    
     
       // ... 
       {
@@ -64,28 +75,22 @@ const router = createBrowserRouter([
         path: "/membership",
         element: <Membership/>
       },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword/>
+      },
+      {
+        path: "/change-password",
+        element: <ChangePassword/>
+      },
       
     ]
   },
-  {
-    path:"/Profile",
-    element: <Profile/>
-  },
-  {path:"/pregnancy-care",
-    element: <PregnancyCare/>
 
-  },
-  {path:"/parenting-education",
-    element: <ParentingEducation/>
-
-  },
  
 
   // ... 
-  {
-    path: "/forgot-password",
-    element: <ForgotPassword/>
-  },
+ 
   {
     path: "/login",
     element: <LoginPage />,
@@ -94,10 +99,7 @@ const router = createBrowserRouter([
     path: "/register",
     element: <RegisterPage />,
   },
-  {
-    path: "/homepage",
-    element:<HomePage />
-  },
+  
   {
     path: "/dashboard",
     element: <AdminLayout/>,

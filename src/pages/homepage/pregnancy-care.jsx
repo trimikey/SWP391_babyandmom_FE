@@ -7,7 +7,6 @@ const PregnancyCare = () => {
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
     style={{ backgroundImage: `url(${backgroundImage})` }}>
-      <HeaderU/>
       <h1 className="text-3xl font-bold text-pink-600 mb-8 text-center">
         Chăm Sóc Thai Kỳ
       </h1>
@@ -140,7 +139,6 @@ const PregnancyCare = () => {
           </ul>
         </div>
       </div>
-      <Footer/>
     </div>
   );
 };
