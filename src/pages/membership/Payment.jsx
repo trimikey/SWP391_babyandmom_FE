@@ -62,12 +62,11 @@ const Payment = () => {
 
       const orderData = {
         type: location.state.packageType,
-        membershipType: location.state.membershipType,
         buyerEmail: userProfile.email
       };
-
-      const response = await api.post('/order/create', orderData);
-
+      console.log(orderData);
+      const response = await api.post(`/order/create?membershipType=${location.state.packageType}`);
+      console.log(response);
       if (response) {
         message.success('Đăng ký gói thành công!');
         setTimeout(() => {
