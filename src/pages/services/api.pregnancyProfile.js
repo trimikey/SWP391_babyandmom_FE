@@ -23,13 +23,12 @@ const pregnancyProfileApi = {
     },
 
     // Tạo mới pregnancy profile
-    createProfile: async (data) => {
+    createProfile: async (profileData) => {
         try {
-            const response = await api.post('/pregnancy-profile', data, getAuthHeader());
-            console.log('Create profile response:', response); // Debug log
+            const response = await api.post('/pregnancy-profile', profileData, getAuthHeader());
             return response.data;
         } catch (error) {
-       ; // Debug log
+            console.error('Error creating pregnancy profile:', error.response?.data || error);
             throw error;
         }
     },

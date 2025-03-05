@@ -93,10 +93,18 @@ const PregnancyProfile = () => {
     try {
       setLoading(true);
       const formattedValues = {
-        ...values,
-        dueDate: values.dueDate.toISOString(),
-        lastPeriod: values.lastPeriod.toISOString(),
+        babyName: values.babyName,
+        babyGender: values.babyGender,
+        dueDate: values.dueDate.format('YYYY-MM-DDTHH:mm:ss'),
+        currentWeek: values.currentWeek,
+        lastPeriod: values.lastPeriod.format('YYYY-MM-DDTHH:mm:ss'),
+        height: parseFloat(values.height)
       };
+
+      if (!formattedValues.babyName || !formattedValues.babyGender || !formattedValues.dueDate || !formattedValues.currentWeek || !formattedValues.lastPeriod || isNaN(formattedValues.height)) {
+        message.error('Vui lòng điền đầy đủ thông tin hợp lệ');
+        return;
+      }
 
       if (profile?.id) {
         await pregnancyProfileApi.updateProfile(profile.id, formattedValues);
@@ -107,7 +115,7 @@ const PregnancyProfile = () => {
       }
       fetchProfile();
     } catch (error) {
-      message.error('Có lỗi xảy ra');
+      message.error('Có lỗi xảy ra: ' + (error.response?.data?.message || 'Vui lòng kiểm tra lại thông tin'));
     } finally {
       setLoading(false);
     }
@@ -191,7 +199,6 @@ const PregnancyProfile = () => {
                 placeholder="Chọn ngày kỳ kinh cuối"
                 onChange={handleLastPeriodChange}
                 disabledDate={(current) => {
-                  // Không cho phép chọn ngày trong tương lai
                   return current && current > moment().endOf('day');
                 }}
               />
@@ -199,11 +206,12 @@ const PregnancyProfile = () => {
 
             <Form.Item
               name="dueDate"
-              label="Ngày dự sinh "
+              label="Ngày dự sinh"
             >
               <DatePicker 
                 className="w-full rounded-lg" 
-                format="DD/MM/YYYY"
+                format="DD/MM/YYYY HH:mm:ss"
+                showTime
                 disabled
               />
             </Form.Item>
@@ -232,7 +240,7 @@ const PregnancyProfile = () => {
                 className="w-full rounded-lg"
                 placeholder="Nhập chiều dài" 
                 step={0.1}
-                precision={1} // Cho phép 1 số thập phân
+                precision={1}
                 min={0.1}
               />
             </Form.Item>
