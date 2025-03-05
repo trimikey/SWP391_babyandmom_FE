@@ -15,7 +15,7 @@ const UserProfile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await api.get('/password/profile', {
+      const response = await api.get('/user/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -24,7 +24,7 @@ const UserProfile = () => {
       if (response.data) {
         // Cập nhật form với dữ liệu từ API
         form.setFieldsValue({
-          name: response.data.name,
+          userName: response.data.userName,
           email: response.data.email,
           phone: response.data.phone
         });
@@ -40,9 +40,16 @@ const UserProfile = () => {
   const handleSubmit = async (values) => {
     try {
       setSubmitting(true);
-      const response = await api.put('/password/update-profile', 
+      
+      // Kiểm tra xem các trường yêu cầu có hợp lệ không
+      if (!values.userName || !values.phone) {
+        message.error('Vui lòng điền đầy đủ thông tin');
+        return;
+      }
+
+      const response = await api.put('/user/update-profile', 
         {
-          name: values.name,
+          userName: values.userName,
           email: values.email,
           phone: values.phone
         },
@@ -59,14 +66,15 @@ const UserProfile = () => {
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         localStorage.setItem('userInfo', JSON.stringify({
           ...userInfo,
-          name: values.name,
+          userName: values.userName,
           email: values.email,
-          phoneNumber: values.phone
+          phone: values.phone
         }));
       }
     } catch (error) {
-      message.error('Cập nhật thông tin thất bại');
-      console.error('Error updating profile:', error);
+      // Ghi lại thông tin lỗi chi tiết
+      console.error('Error updating profile:', error.response?.data || error);
+      message.error('Cập nhật thông tin thất bại: ' + (error.response?.data?.message || 'Có lỗi xảy ra'));
     } finally {
       setSubmitting(false);
     }
@@ -95,8 +103,8 @@ const UserProfile = () => {
             className="space-y-4"
           >
             <Form.Item
-              name="name"
-              label="Họ và tên"
+              name="userName"
+              label="Tên người dùng"
               rules={[
                 { required: true, message: 'Vui lòng nhập họ tên' }
               ]}

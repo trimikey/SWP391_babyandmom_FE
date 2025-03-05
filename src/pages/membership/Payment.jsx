@@ -30,7 +30,7 @@ const Payment = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await api.get('/password/profile', {
+      const response = await api.get('/user/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -62,6 +62,7 @@ const Payment = () => {
 
       const orderData = {
         type: location.state.packageType,
+        membershipType: location.state.membershipType,
         buyerEmail: userProfile.email
       };
 
@@ -126,7 +127,7 @@ const Payment = () => {
               </h3>
               <div className="space-y-2">
                 <p className="text-gray-600">
-                  Họ tên: {userProfile.name}
+                  Họ tên: {userProfile.userName}
                 </p>
                 <p className="text-gray-600">
                   Email: {userProfile.email}

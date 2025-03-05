@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Modal, Form, Input, message, Popconfirm } from 'antd';
 import { EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
-import userApi from '../services/api.user';
+import api from '../../config/axios';
 
 function ManageUser() {
   const [users, setUsers] = useState([]);
@@ -16,7 +16,7 @@ function ManageUser() {
 
   const fetchUsers = async () => {
     try {
-      const response = await userApi.getAllUsers();
+      const response = await api.get('/user');
       setUsers(response.data);
     } catch (error) {
       message.error('Không thể tải danh sách người dùng');
@@ -37,7 +37,7 @@ function ManageUser() {
 
   const handleDelete = async (userId) => {
     try {
-      await userApi.deleteUser(userId);
+      await api.delete(`/user/${userId}`);
       message.success('Xóa người dùng thành công');
       fetchUsers();
     } catch (error) {
@@ -51,10 +51,10 @@ function ManageUser() {
       setLoading(true);
 
       if (editingUser) {
-        await userApi.updateUser(editingUser.id, values);
+        await api.put(`/user/${editingUser.id}`, values);
         message.success('Cập nhật người dùng thành công');
       } else {
-        await userApi.createUser(values);
+        await api.post('/user', values);
         message.success('Thêm người dùng thành công');
       }
 
@@ -198,6 +198,14 @@ function ManageUser() {
               { required: true, message: 'Vui lòng nhập số điện thoại!' },
               { pattern: /^0\d{9}$/, message: 'Số điện thoại không hợp lệ!' }
             ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="password"
+            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
+
           >
             <Input />
           </Form.Item>

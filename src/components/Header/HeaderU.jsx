@@ -22,14 +22,14 @@ const Header = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await api.get('/password/profile', {
+        const response = await api.get('/user/profile', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
         if (response.data) {
-          setUserName(response.data.name || 'Guest');
+          setUserName(response.data.userName || 'Guest');
           setIsLoggedIn(true);
         }
       } catch (error) {
@@ -40,6 +40,10 @@ const Header = () => {
           localStorage.removeItem('token');
           localStorage.removeItem('userInfo');
           setIsLoggedIn(false);
+        } else if (error.response?.status === 403) {
+          // Handle 403 Forbidden error
+          console.error('Access denied. You do not have permission to access this resource.');
+          // Optionally, you can set a state to show a message to the user
         }
       }
     };
