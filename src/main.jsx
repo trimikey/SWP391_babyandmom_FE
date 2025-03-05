@@ -23,6 +23,7 @@ import ForgotPassword from "./pages/login/ForgotPassword.jsx";
 import ChangePassword from "./pages/profiles/ChangePassword.jsx";
 import PaymentCallback from "./pages/membership/PaymentCallback.jsx";
 import Payment from "./pages/membership/Payment.jsx";
+import BlogDetail from "./pages/blog/BlogDetail.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -64,7 +65,12 @@ const router = createBrowserRouter([
         path: "/payment",
         element: <Payment/>
       },
+      {
+        path: "/blog-detail/:id",
+        element: <BlogDetail/>
+      },
     
+     
     
       // ... 
       {
