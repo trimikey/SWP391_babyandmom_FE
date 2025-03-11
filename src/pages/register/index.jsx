@@ -46,6 +46,7 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [duplicateEmailError, setDuplicateEmailError] = useState(null);
   const navigate = useNavigate();
 
   const validatePassword = (password) => {
@@ -165,6 +166,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setDuplicateEmailError(null);
     try {
       if (validateForm()) {
         const requestData = {
@@ -181,15 +183,21 @@ const RegisterPage = () => {
         }
       }
     } catch (err) {
-      // Kiểm tra lỗi email đã tồn tại
-      if (err.response?.data === 400 && err.response?.data?.includes('email')) {
-        toast.error('Email này đã được sử dụng. Vui lòng sử dụng email khác.');
-        setErrors(prev => ({
-          ...prev,
-          email: 'Email này đã được sử dụng'
-        }));
+      console.log('Error response:', err.response);
+      if (err.response?.status === 400) {
+        const errorMessage = err.response.data?.message || err.response.data;
+        if (errorMessage?.toLowerCase().includes('email') || 
+            errorMessage === "Email đã tồn tại") {
+          setDuplicateEmailError('Email này đã được sử dụng. Vui lòng sử dụng email khác.');
+          setErrors(prev => ({
+            ...prev,
+            email: 'Email này đã được sử dụng'
+          }));
+        } else {
+          toast.error(errorMessage || 'Đăng ký thất bại');
+        }
       } else {
-        toast.error(err.response?.data || 'Đăng ký thất bại');
+        toast.error('Đăng ký thất bại. Vui lòng thử lại.');
       }
     } finally {
       setIsLoading(false);
@@ -360,10 +368,13 @@ const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-pink-400 hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
             >
               {isLoading ? "Đang xử lý..." : "Đăng ký"}
             </button>
+            {duplicateEmailError && (
+              <p className="mt-2 text-sm text-red-600 text-center">{duplicateEmailError}</p>
+            )}
           </div>
 
           <div className="mt-6 text-center flex items-center justify-center">

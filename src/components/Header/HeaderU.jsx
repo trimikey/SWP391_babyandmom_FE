@@ -103,7 +103,7 @@ const Header = () => {
                   className="flex items-center space-x-2 text-gray-700 hover:text-pink-600"
                 >
                   <FaUserCircle className="text-lg" />
-                  <span>{userName}</span>
+                  <span>Xin chào, {userName}</span>
                   <FaCaretDown className={`transform transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
@@ -204,10 +204,10 @@ const Header = () => {
               </button>
               
               <button 
-                onClick={() => handleNavigation('/growthchart')} 
+                onClick={() => handleNavigation('/growth-update')} 
                 className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
               >
-                <span>Biểu đồ thai</span>
+                <span>Cập nhật tăng trưởng</span>
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
               </button>
             </div>

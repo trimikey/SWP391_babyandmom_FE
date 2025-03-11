@@ -20,7 +20,7 @@ const UserProfile = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.data) {
         // Cập nhật form với dữ liệu từ API
         form.setFieldsValue({
@@ -40,14 +40,14 @@ const UserProfile = () => {
   const handleSubmit = async (values) => {
     try {
       setSubmitting(true);
-      
+
       // Kiểm tra xem các trường yêu cầu có hợp lệ không
       if (!values.userName || !values.phone) {
         message.error('Vui lòng điền đầy đủ thông tin');
         return;
       }
 
-      const response = await api.put('/user/update-profile', 
+      const response = await api.put('/user/update-profile',
         {
           userName: values.userName,
           email: values.email,
@@ -109,7 +109,7 @@ const UserProfile = () => {
                 { required: true, message: 'Vui lòng nhập họ tên' }
               ]}
             >
-              <Input 
+              <Input
                 prefix={<UserOutlined />}
                 placeholder="Nhập họ và tên"
                 className="rounded-lg"
@@ -120,7 +120,7 @@ const UserProfile = () => {
               name="email"
               label="Email"
             >
-              <Input 
+              <Input
                 prefix={<MailOutlined />}
                 disabled
                 className="rounded-lg bg-gray-50"
@@ -135,34 +135,28 @@ const UserProfile = () => {
                 { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ' }
               ]}
             >
-              <Input 
+              <Input
                 prefix={<PhoneOutlined />}
                 placeholder="Nhập số điện thoại"
                 className="rounded-lg"
               />
             </Form.Item>
 
-            <Form.Item className="text-center">
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={submitting}
-                className="bg-pink-600 hover:bg-pink-700 border-pink-600 rounded-lg px-8"
+            <div className="text-center">
+
+              {/* bo ngoai form */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-pink-600 hover:bg-pink-700 border border-pink-600 rounded-lg px-8 py-2 text-white"
               >
-                Cập nhật
-              </Button>
-            </Form.Item>
+                {submitting ? "Đang cập nhật..." : "Cập nhật"}
+              </button>
+            </div>
+
           </Form>
 
-          <div className="mt-4 text-center">
-            <Button 
-              type="link" 
-              href="/change-password"
-              className="text-pink-600 hover:text-pink-700"
-            >
-              Đổi mật khẩu
-            </Button>
-          </div>
+         
         </Card>
       </div>
     </div>

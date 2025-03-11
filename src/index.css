@@ -1,2 +1,19 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
+
+/* Override default link styles */
+a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* Specific override for footer links if needed */
+footer a {
+  color: black !important;
+  text-decoration: none !important;
+}
+
+/* For hover states */
+footer a:hover {
+  color: #4B5563 !important; /* gray-600 */
+}

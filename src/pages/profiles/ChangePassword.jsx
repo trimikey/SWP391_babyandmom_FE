@@ -101,25 +101,26 @@ const ChangePassword = () => {
               />
             </Form.Item>
 
-            <Form.Item className="text-center">
-              <Button 
+            <div className="text-center">
+              <button 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                className="bg-pink-600 hover:bg-pink-700 border-pink-600 rounded-lg px-8 w-full"
+                className="bg-pink-600 hover:bg-pink-700 border-pink-600 rounded-lg px-6 text-white text-sm py-2"
               >
                 Đổi mật khẩu
-              </Button>
-            </Form.Item>
+              </button> 
+            </div>  
+            
 
             <div className="text-center">
-              <Button 
+              <button 
                 type="link" 
                 onClick={() => navigate('/')}
                 className="text-pink-600 hover:text-pink-700"
               >
                 Quay lại trang chủ
-              </Button>
+              </button>
             </div>
           </Form>
         </Card>

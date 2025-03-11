@@ -159,7 +159,7 @@ const FAQManagement = () => {
             label="Thứ tự hiển thị"
             rules={[{ required: true, message: 'Vui lòng nhập thứ tự hiển thị' }]}
           >
-            <Input type="number" />
+            <Input type="number" /> 
           </Form.Item>
 
           <Form.Item
