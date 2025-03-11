@@ -154,7 +154,7 @@ const PregnancyProfile = () => {
       `}</style>
       <div className="max-w-3xl mx-auto">
         <Card className="shadow-lg rounded-lg">
-          <h1 className="text-2xl font-semibold text-pink-600 mb-6 text-center">
+          <h1 className="text-2xl font-semibold text-pink-400 mb-6 text-center">
             Thông Tin Thai Kỳ
           </h1>
 
@@ -246,14 +246,14 @@ const PregnancyProfile = () => {
             </Form.Item>
 
             <Form.Item className="text-center">
-              <Button 
+              <button 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                className="bg-pink-600 hover:bg-pink-700 border-pink-600 rounded-lg px-8"
+                className="bg-pink-400 hover:bg-pink-400 border-pink-400 text-white px-8 py-2 rounded-lg"
               >
                 {profile ? 'Cập nhật' : 'Thêm mới'}
-              </Button>
+              </button>
             </Form.Item>
           </Form>
         </Card>

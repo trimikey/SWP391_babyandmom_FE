@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Collapse } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
 
@@ -96,33 +96,18 @@ const FaqPage = () => {
             <p className="text-gray-600 mb-4">
               Đừng ngần ngại liên hệ với đội ngũ hỗ trợ của chúng tôi
             </p>
-            <a
-              href="mailto:support@babyandmom.com"
-              className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 transition-colors duration-200"
+            <Link
+              to="mailto:leductri12321@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg text-white bg-pink-500 hover:bg-pink-600 transition-colors duration-200"
             >
               Liên hệ hỗ trợ
-            </a>
+            </Link>
           </div>
 
-          {/* Gợi ý các chủ đề phổ biến */}
-          <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-            <button className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow text-center">
-              Thai kỳ
-            </button>
-            <button className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow text-center">
-              Dinh dưỡng
-            </button>
-            <button className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow text-center">
-              Sức khỏe
-            </button>           
-            <button className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow text-center">
-              Khác
-            </button>
-          </div>
+          
         </div>
       </main>
 
-      {/* Footer */}
     </div>
   );
 };

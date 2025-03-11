@@ -101,7 +101,7 @@ const Homepage = () => {
                 {/* Monitoring Feature */}
                 <Link to="/pregnancy-monitoring" className="block hover:transform hover:scale-105 transition-transform duration-300">
                   <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                    <h4 className="text-xl font-semibold text-purple-800 mb-4">Theo Dõi Thai Nhi</h4>
+                    <h4 className="text-xl font-semibold text-pink-400 mb-4">Theo Dõi Thai Nhi</h4>
                     <p className="text-gray-700">Ghi chép và theo dõi sự phát triển của thai nhi theo từng tuần. Cập nhật cân nặng, chiều cao và các mốc phát triển quan trọng.</p>
                   </div>
                 </Link>
@@ -109,7 +109,7 @@ const Homepage = () => {
                 {/* Health Care Feature */}
                 <Link to="/pregnancy-care" className="block hover:transform hover:scale-105 transition-transform duration-300">
                   <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                    <h4 className="text-xl font-semibold text-purple-800 mb-4">Chăm Sóc Sức Khỏe</h4>
+                    <h4 className="text-xl font-semibold text-pink-400 mb-4">Chăm Sóc Sức Khỏe</h4>
                     <p className="text-gray-700">Nhận lời khuyên về dinh dưỡng, tập luyện và chế độ sinh hoạt phù hợp. Theo dõi các chỉ số sức khỏe quan trọng trong thai kỳ.</p>
                   </div>
                 </Link>
@@ -117,7 +117,7 @@ const Homepage = () => {
                 {/* Parenting Education Feature */}
                 <Link to="/parenting-education" className="block hover:transform hover:scale-105 transition-transform duration-300">
                   <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                    <h4 className="text-xl font-semibold text-purple-800 mb-4">Giáo dục sớm & làm cha mẹ</h4>
+                    <h4 className="text-xl font-semibold text-pink-4  00 mb-4">Giáo dục sớm & làm cha mẹ</h4>
                     <p className="text-gray-700">Chia sẻ những kiến thức cho những bậc cha mẹ để giúp con mình phát triển nhanh hơn. Xem các video hướng dẫn chi tiết.</p>
                   </div>
                 </Link>

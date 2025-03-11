@@ -24,6 +24,7 @@ import ChangePassword from "./pages/profiles/ChangePassword.jsx";
 import PaymentCallback from "./pages/membership/PaymentCallback.jsx";
 import Payment from "./pages/membership/Payment.jsx";
 import BlogDetail from "./pages/blog/BlogDetail.jsx";
+import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
         path: "/blog-detail/:id",
         element: <BlogDetail/>
       },
+      {
+        path: "/growth-update",
+        element: <GrowthUpdate/>
+      },
     
      
     
@@ -81,10 +86,7 @@ const router = createBrowserRouter([
         path: "/membership",
         element: <Membership/>
       },
-      {
-        path: "/forgot-password",
-        element: <ForgotPassword/>
-      },
+     
       {
         path: "/change-password",
         element: <ChangePassword/>
@@ -93,7 +95,10 @@ const router = createBrowserRouter([
     ]
   },
 
- 
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword/>
+  },
 
   // ... 
  

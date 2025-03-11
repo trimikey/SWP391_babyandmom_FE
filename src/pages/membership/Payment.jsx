@@ -106,7 +106,7 @@ const Payment = () => {
               Xác Nhận Đăng Ký Gói Thành Viên
             </h2>
             <p className="text-gray-600 mt-2">
-              Gói: {location.state?.packageName}
+              Gói: {location.state?.packageType}
             </p>
             <p className="text-gray-600 mt-1">
               Giá: {new Intl.NumberFormat('vi-VN', {
@@ -138,23 +138,22 @@ const Payment = () => {
             </div>
 
             <div className="text-center space-y-4">
-              <Button
-                type="primary"
-                size="large"
+              <button
+                type="button"
                 onClick={handleCreateOrder}
                 loading={loading}
-                className="bg-pink-600 hover:bg-pink-700 border-pink-600 w-full rounded-lg"
+                className="bg-pink-500 hover:bg-pink-700 border-pink-500 w-full rounded-lg text-white text-lg py-2"
               >
                 Xác nhận đăng ký
-              </Button>
+              </button>
               
-              <Button 
+              <button
                 type="link" 
                 onClick={() => navigate('/membership')}
                 className="text-pink-600 hover:text-pink-700"
               >
                 Quay lại
-              </Button>
+              </button>
             </div>
           </div>
         </Card>
