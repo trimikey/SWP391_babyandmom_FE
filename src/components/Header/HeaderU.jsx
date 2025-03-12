@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../../config/axios';
 import logoImage from '../../assets/logo.jpg';
 import { 
@@ -11,6 +11,7 @@ import {
   FaBabyCarriage // Icon thông tin thai kỳ
 } from 'react-icons/fa';
 import { MdPregnantWoman } from 'react-icons/md'; // Icon bà bầu từ Material Design icons
+import { message } from 'antd';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -18,7 +19,9 @@ const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false); // State for dropdown
   const [userName, setUserName] = useState('');
   const token = localStorage.getItem('token');
-
+  const [profile, setProfile] = useState(null);
+  const [pregnancyProfile, setPregnancyProfile] = useState(null);
+  const [pregnancyRecords, setPregnancyRecords] = useState(null);
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -56,9 +59,51 @@ const Header = () => {
     }
   }, [token]);
 
+  useEffect(() => {
+    const fetchPregnancyProfile = async () => {
+      try {
+        const response = await api.get('/pregnancy-profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const responsePregnancyRecords = await api.get(`/growth-records/current?profileId=${localStorage.getItem('profileId')}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          
+        });
+        console.log( responsePregnancyRecords);
+        
+        setPregnancyRecords(responsePregnancyRecords.data);
+        console.log('Pregnancy Profile:', response.data);
+        if (response.data && response.data.length > 0) {
+          setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
+        }
+      } catch (error) {
+        console.error('Error fetching pregnancy profile:', error);
+      }
+    };
+
+    if (token) {
+      fetchPregnancyProfile();
+    }
+  }, [token]);
+
   const handleNavigation = (path) => {
-    navigate(path);
-    setShowDropdown(false); // Close dropdown after navigation
+    if (path === '/growth-records' && pregnancyProfile) {
+      if(pregnancyRecords){
+        navigate(`/growth-records/profile/${pregnancyRecords[pregnancyRecords.length - 1].id}`);
+      }else{
+        navigate(`/growth-records/profile}`);
+      }
+    } else if (path === '/growth-records' && !pregnancyProfile) {
+      message.error('Vui lòng tạo hồ sơ thai kỳ trước');
+      navigate('profile/pregnancy-profile');
+    } else {
+      navigate(path);
+    }
+    setShowDropdown(false);
   };
 
   const handleLogout = () => {
@@ -204,7 +249,7 @@ const Header = () => {
               </button>
               
               <button 
-                onClick={() => handleNavigation('/growth-update')} 
+                onClick={() => handleNavigation('/growth-records')} 
                 className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
               >
                 <span>Cập nhật tăng trưởng</span>
