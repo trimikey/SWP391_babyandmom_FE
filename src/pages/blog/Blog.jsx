@@ -3,7 +3,7 @@ import { Card, Row, Col, Input, Spin, Typography, Button, Form, message } from '
 import { useNavigate } from 'react-router-dom';
 import blogApi from '../services/api.blog';
 import moment from 'moment';
-
+import backgroundImage from '../../assets/background.jpg';
 const { Search } = Input;
 const { Title } = Typography;
 
@@ -77,8 +77,9 @@ const Blog = () => {
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            <Title level={2} className="mb-6">Blog</Title>
+<div className="min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${backgroundImage})` }}>     
+             <Title level={2} className="mb-6">Blog</Title>
             <Form form={form} layout="vertical" onFinish={onFinish} className="mb-4">
                 <Form.Item
                     label="Tiêu đề"
@@ -114,7 +115,11 @@ const Blog = () => {
                     {filteredBlogs.length > 0 ? (
                         filteredBlogs.map(blog => (
                             <Col xs={24} sm={12} lg={8} key={blog.id}>
-                                <Card hoverable className="h-full" onClick={() => viewBlogDetail(blog.id)}>
+                                <Card 
+                                    hoverable 
+                                    className="h-full"
+                                    onClick={() => viewBlogDetail(blog.id)}
+                                >
                                     <Card.Meta
                                         title={blog.title}
                                         description={
@@ -126,11 +131,24 @@ const Blog = () => {
                                                     {blog.content.replace(/<[^>]+>/g, '')}
                                                 </div>
                                                 {currentUser && currentUser.id === blog.userId && (
-                                                    <div>
-                                                        <Button type="link" onClick={(e) => { e.stopPropagation(); editBlog(blog); }}>
+                                                    <div className="mt-2">
+                                                        <Button 
+                                                            type="link" 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                editBlog(blog);
+                                                            }}
+                                                        >
                                                             Sửa
                                                         </Button>
-                                                        <Button type="link" danger onClick={(e) => { e.stopPropagation(); deleteBlog(blog.id); }}>
+                                                        <Button 
+                                                            type="link" 
+                                                            danger 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                deleteBlog(blog.id);
+                                                            }}
+                                                        >
                                                             Xóa
                                                         </Button>
                                                     </div>

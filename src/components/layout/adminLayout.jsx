@@ -17,6 +17,7 @@ const items = [
   getItem("faq", "faq", <DesktopOutlined />),
   getItem("membership", "membership", <DesktopOutlined />),
   getItem("blog", "blog", <DesktopOutlined />),
+  getItem("order", "order", <DesktopOutlined />),
   //   getItem("User", "sub1", <UserOutlined />, [
   //     getItem("Tom", "3"),
   //     getItem("Bill", "4"),

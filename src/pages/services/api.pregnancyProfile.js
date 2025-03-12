@@ -26,6 +26,7 @@ const pregnancyProfileApi = {
     createProfile: async (profileData) => {
         try {
             const response = await api.post('/pregnancy-profile', profileData, getAuthHeader());
+            localStorage.setItem('profileId', response.data.id);
             return response.data;
         } catch (error) {
             console.error('Error creating pregnancy profile:', error.response?.data || error);

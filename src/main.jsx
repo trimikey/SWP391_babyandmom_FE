@@ -25,14 +25,15 @@ import PaymentCallback from "./pages/membership/PaymentCallback.jsx";
 import Payment from "./pages/membership/Payment.jsx";
 import BlogDetail from "./pages/blog/BlogDetail.jsx";
 import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
+import OrderManagement from "./pages/admin/OrderManagement.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
 
 const router = createBrowserRouter([
   {
-    path:"",
-    element: <MainLayout/>,
+    path: "/",
+    element: <MainLayout />,
     children: [
       {
         path: "/blog",
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       },
       {
         path:"/Profile/pregnancy-profile",
+        element: <PregnancyProfile/>
+      },
+      {
+        path:"/Profile/pregnancy-profile/:id",
         element: <PregnancyProfile/>
       },
       {path:"/pregnancy-care",
@@ -71,13 +76,14 @@ const router = createBrowserRouter([
         element: <BlogDetail/>
       },
       {
-        path: "/growth-update",
-        element: <GrowthUpdate/>
+        path: "growth-records/profile/",
+        element: <GrowthUpdate />
       },
-    
+      {
+        path: "growth-records/profile/:id",
+        element: <GrowthUpdate />
+      },
      
-    
-      // ... 
       {
         path:"/faq",
         element: <FAQ/>
@@ -86,12 +92,10 @@ const router = createBrowserRouter([
         path: "/membership",
         element: <Membership/>
       },
-     
       {
         path: "/change-password",
         element: <ChangePassword/>
       },
-      
     ]
   },
 
@@ -100,8 +104,6 @@ const router = createBrowserRouter([
     element: <ForgotPassword/>
   },
 
-  // ... 
- 
   {
     path: "/login",
     element: <LoginPage />,
@@ -115,6 +117,10 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: <AdminLayout/>,
     children:[
+      {
+        path: "/dashboard/order",
+        element: <OrderManagement/>
+      },
       
       {
         path: "/dashboard/user",
