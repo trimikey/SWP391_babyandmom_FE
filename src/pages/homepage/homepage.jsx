@@ -7,7 +7,10 @@ import bannerImage from '../../assets/banner2.jpg';
 import introImage from '../../assets/baby-intro2.jpg';
 import { Link } from 'react-router-dom';
 
-
+import bannerImage3 from '../../assets/slide4.jpg';
+import bannerImage4 from '../../assets/slide5.webp';
+import bannerImage5 from '../../assets/slide6.webp';
+import { Carousel } from 'antd';
 
 const Homepage = () => {
   const navigate = useNavigate();
@@ -76,10 +79,54 @@ const Homepage = () => {
               <p className="text-xl text-gray-700">Hãy bắt đầu hành trình của bạn cùng chúng tôi.</p>
             </div>
             
-            {/* Banner Image */}
-            <div className="w-full h-[400px] relative mb-12">
-              <img src={bannerImage} alt="Banner" className="w-full h-full object-cover rounded-lg shadow-lg" />
-            </div>
+            {/* Banner Carousel */}
+            <Carousel autoplay effect="fade" className="mb-12">
+              <div>
+                <div className="h-[400px] relative">
+                  <img 
+                    src={bannerImage} 
+                    alt="Banner 1" 
+                    className="w-full h-full object-cover rounded-lg shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-white p-6">
+                      <h3 className="text-3xl font-bold mb-2">Chăm sóc mẹ và bé</h3>
+                      <p className="text-xl">Đồng hành cùng bạn trong hành trình làm mẹ</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="h-[400px] relative">
+                  <img 
+                    src={bannerImage5} 
+                    alt="Banner 2" 
+                    className="w-full h-full object-cover rounded-lg shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-white p-6">
+                      <h3 className="text-3xl font-bold mb-2">Theo dõi thai kỳ</h3>
+                      <p className="text-xl">Cập nhật thông tin thai kỳ của bạn</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div className="h-[400px] relative">
+                  <img 
+                    src={bannerImage4} 
+                    alt="Banner 3" 
+                    className="w-full h-full object-cover rounded-lg shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-white p-6">
+                      <h3 className="text-3xl font-bold mb-2">Chia sẻ kinh nghiệm</h3>
+                      <p className="text-xl">Cùng chia sẻ và học hỏi kinh nghiệm nuôi con</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Carousel>
 
             {/* Introduction Section */}
             <section className="flex flex-col md:flex-row items-center py-12 px-6 bg-pink-200/80 rounded-lg shadow-lg">
@@ -117,7 +164,7 @@ const Homepage = () => {
                 {/* Parenting Education Feature */}
                 <Link to="/parenting-education" className="block hover:transform hover:scale-105 transition-transform duration-300">
                   <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                    <h4 className="text-xl font-semibold text-pink-4  00 mb-4">Giáo dục sớm & làm cha mẹ</h4>
+                    <h4 className="text-xl font-semibold text-pink-400 mb-4">Giáo dục sớm & làm cha mẹ</h4>
                     <p className="text-gray-700">Chia sẻ những kiến thức cho những bậc cha mẹ để giúp con mình phát triển nhanh hơn. Xem các video hướng dẫn chi tiết.</p>
                   </div>
                 </Link>

@@ -67,18 +67,39 @@ const Header = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        const responsePregnancyRecords = await api.get(`/growth-records/current?profileId=${localStorage.getItem('profileId')}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
+
+      //   const responsePregnancyRecords = await api.get(`/growth-records/current?profileId=${localStorage.getItem('profileId')}`, {
+      //     headers: {
+      //       'Authorization': `Bearer ${token}`
+      //     },
           
-        });
-        console.log( responsePregnancyRecords);
-        
-        setPregnancyRecords(responsePregnancyRecords.data);
-        console.log('Pregnancy Profile:', response.data);
+      //   });
+      //   // console.log( responsePregnancyRecords);
+      //   console.log('Pregnancy Profile:', pregnancyProfile);
+      // console.log('Pregnancy Records:', pregnancyRecords);
+
+      //   setPregnancyRecords(responsePregnancyRecords.data);
+      //   // console.log('Pregnancy Profile:', response.data);
+      //   if (response.data && response.data.length > 0) {
+      //     setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
+        // Debug response
+        console.log('Pregnancy Profile Response:', response.data);
+
         if (response.data && response.data.length > 0) {
-          setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
+          setPregnancyProfile(response.data[0]);
+          localStorage.setItem('profileId', response.data[0].id); // Lưu profileId vào localStorage
+          
+          // Fetch pregnancy records sau khi có profile
+          try {
+            const recordsResponse = await api.get(`/growth-records/current?profileId=${response.data[0].id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            setPregnancyRecords(recordsResponse.data);
+          } catch (error) {
+            console.error('Error fetching pregnancy records:', error);
+          }
         }
       } catch (error) {
         console.error('Error fetching pregnancy profile:', error);
@@ -91,15 +112,20 @@ const Header = () => {
   }, [token]);
 
   const handleNavigation = (path) => {
-    if (path === '/growth-records' && pregnancyProfile) {
-      if(pregnancyRecords){
-        navigate(`/growth-records/profile/${pregnancyRecords[pregnancyRecords.length - 1].id}`);
-      }else{
-        navigate(`/growth-records/profile}`);
+    if (path === '/growth-records') {
+      console.log('PregnancyProfile:', pregnancyProfile);
+      console.log('PregnancyRecords:', pregnancyRecords);
+      
+      if (pregnancyProfile?.id) {
+        if (pregnancyRecords && pregnancyRecords.length > 0) {
+          navigate(`/growth-records/profile/${pregnancyRecords[pregnancyRecords.length - 1].id}`);
+        } else {
+          navigate('/growth-records/profile');
+        }
+      } else {
+        message.error('Vui lòng tạo hồ sơ thai kỳ trước');
+        navigate('/profile/pregnancy-profile');
       }
-    } else if (path === '/growth-records' && !pregnancyProfile) {
-      message.error('Vui lòng tạo hồ sơ thai kỳ trước');
-      navigate('profile/pregnancy-profile');
     } else {
       navigate(path);
     }
