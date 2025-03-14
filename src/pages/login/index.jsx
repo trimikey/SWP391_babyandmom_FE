@@ -5,19 +5,22 @@ import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import logoImage from '../../assets/logo1.jpg';
 import { jwtDecode } from "jwt-decode";
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/slices/authSlice';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
-    name:""
+    userName:""
   });
   
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate()
+  const dispatch = useDispatch();
 
   const validateForm = () => {
     const newErrors = {};
@@ -46,40 +49,36 @@ const LoginPage = () => {
         const response = await api.post('login', formData);
         console.log('Response:', response.data);
 
-        // Lấy accessToken và thông tin từ response
-        const { accessToken, message, role, email, name } = response.data;
-        console.log()
-        if (accessToken) {  
-          // Lưu token và thông tin user vào localStorage
-          localStorage.setItem('token', accessToken);
-          localStorage.setItem('userInfo', JSON.stringify({
-            email: email,
-          name: name, // Sử dụng fullName từ response
-          role: role
-          }));
+        if (response.data.accessToken) {  
+          const { accessToken, role, email,  userName } = response.data;
+          const decodedToken = jwtDecode(accessToken);
+          
+          // Lưu user vào Redux store
+          const userData = {
+            id: decodedToken.id || decodedToken.sub, // Lấy id từ token
+            email: email || decodedToken.sub,
+            userName: userName || decodedToken.userName,
+            role: role
+          };
+          
+          console.log('User data to store:', userData); // Debug
+          dispatch(setUser(userData));
 
-          // Cập nhật header mặc định cho axios
+          // Lưu token
+          localStorage.setItem('token', accessToken);
           api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
           
-          toast.success(message || 'Đăng nhập thành công!');
-          const token = jwtDecode(response.data.accessToken)
-          localStorage.setItem('email', token.sub)
-          localStorage.setItem('accessToken', token)
-          localStorage.setItem('name', token.name)
-          
-          console.log(token)
-          // Điều hướng dựa trên role
+          toast.success('Đăng nhập thành công!');
+
           if (role === 'ADMIN') {
             navigate('/dashboard');
           } else {
             navigate('/');
           }
         }
-
       } catch (err) {
         console.error('Error:', err);
-        const errorMessage = err.response?.data?.error || 'Đăng nhập thất bại';
-        toast.error(errorMessage);
+        toast.error('Đăng nhập thất bại');
       } finally {
         setIsLoading(false);
       }
