@@ -3,16 +3,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../../config/axios';
 import logoImage from '../../assets/logo.jpg';
 import { 
-  FaUser, 
-  FaKey, 
+
   FaSignOutAlt, 
   FaCaretDown, 
   FaUserCircle, // Icon thông tin cá nhân
-  FaBabyCarriage // Icon thông tin thai kỳ
-} from 'react-icons/fa';
-import { MdPregnantWoman } from 'react-icons/md'; // Icon bà bầu từ Material Design icons
-import { message } from 'antd';
-
+  FaBabyCarriage, // Icon thông tin thai kỳ
+  FaBell // Icon cho nhắc nhở
+} from 'react-icons/fa'
+import { MdPregnantWoman } from 'react-icons/md';
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -22,6 +20,9 @@ const Header = () => {
   const [profile, setProfile] = useState(null);
   const [pregnancyProfile, setPregnancyProfile] = useState(null);
   const [pregnancyRecords, setPregnancyRecords] = useState(null);
+  
+  // State cho modal nhắc nhở
+ 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -82,8 +83,8 @@ const Header = () => {
       //   // console.log('Pregnancy Profile:', response.data);
       //   if (response.data && response.data.length > 0) {
       //     setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
-        // Debug response
-        console.log('Pregnancy Profile Response:', response.data);
+       
+        // console.log('Pregnancy Profile Response:', response.data);
 
         if (response.data && response.data.length > 0) {
           setPregnancyProfile(response.data[0]);
@@ -111,6 +112,8 @@ const Header = () => {
     }
   }, [token]);
 
+
+
   const handleNavigation = (path) => {
     if (path === '/growth-records') {
       console.log('PregnancyProfile:', pregnancyProfile);
@@ -133,12 +136,21 @@ const Header = () => {
   };
 
   const handleLogout = () => {
+    // Xóa hoàn toàn thông tin đăng nhập
     localStorage.removeItem('token');
-    localStorage.removeItem('userInfo');
-    setIsLoggedIn(false);
-    setUserName('Guest');
-    navigate('/login');
+    localStorage.removeItem('user');
+    // Xóa bất kỳ thông tin lưu trữ nào khác liên quan đến session
+    
+    // Force reload trang để xóa tất cả state trong bộ nhớ
+    window.location.href = '/login';
   };
+
+  // Hiển thị modal thêm lời nhắc
+  
+
+  // Đóng modal
+ 
+
 
   return (
     <>
@@ -193,45 +205,54 @@ const Header = () => {
                           handleNavigation('/profile');
                           setShowDropdown(false);
                         }}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                       >
-                        <FaUserCircle className="text-pink-500" />
-                        <span>Thông tin cá nhân</span>
+                        <FaUserCircle className="mr-3" />
+                        Thông tin cá nhân
                       </button>
 
                       <button
                         onClick={() => {
-                          handleNavigation('/profile/pregnancy-profile'); 
+                          handleNavigation('/profile/pregnancy-profile');
                           setShowDropdown(false);
                         }}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                       >
-                        <MdPregnantWoman className="text-pink-500" />
-                        <span>Thông tin thai kỳ</span>
+                        <MdPregnantWoman className="mr-3" />
+                        Thông tin thai kỳ
                       </button>
 
                       <button
                         onClick={() => {
-                          handleNavigation('/change-password');
+                          handleNavigation('/growth-records');
                           setShowDropdown(false);
                         }}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                       >
-                        <FaKey className="text-pink-500" />
-                        <span>Đổi mật khẩu</span>
+                        <FaBabyCarriage className="mr-3" />
+                        Thông tin tăng trưởng
+                      </button>
+
+                      {/* Thêm mục Thêm lời nhắc */}
+                      <button
+                        onClick={() => {
+                          handleNavigation('/reminders');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      >
+                        <FaBell className="mr-3" />
+                        Quản lý lời nhắc
                       </button>
 
                       <div className="border-t border-gray-100 my-1"></div>
 
                       <button
-                        onClick={() => {
-                          handleLogout();
-                          setShowDropdown(false);
-                        }}
-                        className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center"
                       >
-                        <FaSignOutAlt className="text-red-500" />
-                        <span>Đăng xuất</span>
+                        <FaSignOutAlt className="mr-3" />
+                        Đăng xuất
                       </button>
                     </div>
                   </div>
@@ -287,6 +308,9 @@ const Header = () => {
       </header>
       {/* Add padding to account for fixed header */}
       <div className="h-32"></div>
+
+     
+      
     </>
   );
 };
