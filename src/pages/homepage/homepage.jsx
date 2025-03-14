@@ -6,8 +6,6 @@ import backgroundImage from '../../assets/background.jpg';
 import bannerImage from '../../assets/banner2.jpg';
 import introImage from '../../assets/baby-intro2.jpg';
 import { Link } from 'react-router-dom';
-
-import bannerImage3 from '../../assets/slide4.jpg';
 import bannerImage4 from '../../assets/slide5.webp';
 import bannerImage5 from '../../assets/slide6.webp';
 import { Carousel } from 'antd';
@@ -144,15 +142,7 @@ const Homepage = () => {
             <section className="mt-12 py-12 px-6 bg-pink-100/80 rounded-lg shadow-lg">
               <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Chăm Sóc và Theo Dõi Thai Kỳ</h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Monitoring Feature */}
-                <Link to="/pregnancy-monitoring" className="block hover:transform hover:scale-105 transition-transform duration-300">
-                  <div className="bg-white p-6 rounded-lg shadow-md h-full">
-                    <h4 className="text-xl font-semibold text-pink-400 mb-4">Theo Dõi Thai Nhi</h4>
-                    <p className="text-gray-700">Ghi chép và theo dõi sự phát triển của thai nhi theo từng tuần. Cập nhật cân nặng, chiều cao và các mốc phát triển quan trọng.</p>
-                  </div>
-                </Link>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Health Care Feature */}
                 <Link to="/pregnancy-care" className="block hover:transform hover:scale-105 transition-transform duration-300">
                   <div className="bg-white p-6 rounded-lg shadow-md h-full">

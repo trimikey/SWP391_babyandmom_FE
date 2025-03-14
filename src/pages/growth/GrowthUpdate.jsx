@@ -13,7 +13,9 @@ const GrowthUpdate = () => {
   const [growthRecords, setGrowthRecords] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [weightWarning, setWeightWarning] = useState('');
-
+  const [preBMI, setPreBMI] = useState(null);
+  const [currentBMI, setCurrentBMI] = useState(null);
+  const [alertStatus, setAlertStatus] = useState(null);
 
   useEffect(() => {
     console.log('Current profileId:', profileId);
@@ -28,7 +30,7 @@ const GrowthUpdate = () => {
     console.log('Current id:', id);
     if (id) {
       setIsEditing(true);
-      fetchGrowthRecords();
+      fetchGrowthRecordById(id);
     }
   }, [id]);
 
@@ -56,43 +58,51 @@ const GrowthUpdate = () => {
           if (latestRecord) {
             // Khi có bản ghi mới nhất, đặt isEditing thành true
             setIsEditing(true);
-            
-            console.log('Latest growth record:', latestRecord);
-            form.setFieldsValue({
-              pregnancyWeek: latestRecord.pregnancyWeek,
-              pregnancyWeight: latestRecord.pregnancyWeight,
-              pregnancyHeight: latestRecord.pregnancyHeight,
-              prePregnancyWeight: latestRecord.prePregnancyWeight,
-              prePregnancyHeight: latestRecord.prePregnancyHeight,
-              notes: latestRecord.notes
-            });
+            populateFormWithRecord(latestRecord);
           }
-        }
-      } else {
-        const response = await api.get(`/growth-records/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }); 
-        setGrowthRecords(response.data);
-        const recordToEdit = response.data;
-        if (recordToEdit) {
-          console.log('Found record to edit:', recordToEdit);
-          form.setFieldsValue({
-            pregnancyWeek: recordToEdit.pregnancyWeek,
-            pregnancyWeight: recordToEdit.pregnancyWeight,
-            pregnancyHeight: recordToEdit.pregnancyHeight,
-            prePregnancyWeight: recordToEdit.prePregnancyWeight,
-            prePregnancyHeight: recordToEdit.prePregnancyHeight,
-            notes: recordToEdit.notes
-          });
-        } else {
-          message.error('Không tìm thấy thông tin theo dõi thai kỳ');
         }
       }
     } catch (error) {
       console.error('Error fetching growth records:', error);
     }
+  };
+
+  const fetchGrowthRecordById = async (recordId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await api.get(`/growth-records/${recordId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }); 
+      const recordToEdit = response.data;
+      if (recordToEdit) {
+        console.log('Found record to edit:', recordToEdit);
+        populateFormWithRecord(recordToEdit);
+      } else {
+        message.error('Không tìm thấy thông tin theo dõi thai kỳ');
+      }
+    } catch (error) {
+      console.error('Error fetching growth record by id:', error);
+      message.error('Có lỗi xảy ra khi tải thông tin theo dõi thai kỳ');
+    }
+  };
+
+  const populateFormWithRecord = (record) => {
+    form.setFieldsValue({
+      pregnancyWeek: record.pregnancyWeek,
+      pregnancyWeight: record.pregnancyWeight,
+      pregnancyHeight: record.pregnancyHeight,
+      prePregnancyWeight: record.prePregnancyWeight,
+      prePregnancyHeight: record.prePregnancyHeight,
+      notes: record.notes
+    });
+    
+    // Lưu thông tin BMI và cảnh báo
+    setPreBMI(record.prePregnancyBMI);
+    setCurrentBMI(record.currentBMI);
+    setWeightWarning(record.weightWarning);
+    setAlertStatus(record.alertStatus);
   };
 
   const onFinish = async (values) => {
@@ -114,6 +124,8 @@ const GrowthUpdate = () => {
       if (isEditing && id) { 
         await api.put(`/growth-records/${id}`, requestData);
         message.success('Cập nhật thông tin thành công!');
+        // Refresh data to show updated BMI and warnings
+        fetchGrowthRecordById(id);
       } else {
         const response = await api.post('/growth-records', requestData);
         message.success('Tạo thông tin thành công!');
@@ -126,8 +138,6 @@ const GrowthUpdate = () => {
           navigate(`/growth-records/profile/${response.data.id}`, { replace: true });
         }
       }
-      // Fetch lại dữ liệu để cập nhật form
-      fetchGrowthRecords();
     } catch (error) {
       console.error('Error in form submission:', error);
       message.error('Có lỗi xảy ra khi cập nhật thông tin');
@@ -136,33 +146,60 @@ const GrowthUpdate = () => {
     }
   };
 
-  const checkWeightGain = (pregnancyWeek, currentWeight, preWeight) => {
-    if (!pregnancyWeek || !currentWeight || !preWeight) return;
-    
-    const weightGain = currentWeight - preWeight;
-    let warning = '';
-
-    if (pregnancyWeek <= 12) {
-      if (weightGain < 0.5) warning = 'Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi';
-      if (weightGain > 2) warning = 'Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống';
-    } else if (pregnancyWeek <= 28) {
-      if (weightGain < 4) warning = 'Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi';
-      if (weightGain > 8) warning = 'Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống';
-    } else {
-      if (weightGain < 8) warning = 'Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi';
-      if (weightGain > 12) warning = 'Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống';
+  // Hàm để hiển thị đúng ngôn ngữ Tiếng Việt cho cảnh báo
+  const translateWarning = (warning) => {
+    if (warning.includes("too little") || warning.includes("Gaining too little")) {
+      return "Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi";
+    } else if (warning.includes("too much") || warning.includes("Gain too much")) {
+      return "Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống";
+    } else if (warning.includes("Normal")) {
+      return "Mức tăng cân bình thường";
     }
-
-    setWeightWarning(warning);
+    return warning;
   };
 
-  const handleFormChange = () => {
-    const values = form.getFieldsValue();
-    checkWeightGain(
-      Number(values.pregnancyWeek),
-      Number(values.prePregnancyWeight),
-      Number(values.pregnancyWeight)
-    );
+  // Hàm để quyết định màu sắc dựa trên alert status
+  const getAlertStatusColor = (status) => {
+    switch(status) {
+      case 'LOW':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-700';
+      case 'NORMAL':
+        return 'bg-green-50 border-green-200 text-green-700';
+      case 'HIGH':
+        return 'bg-red-50 border-red-200 text-red-700';
+      default:
+        return 'bg-gray-50 border-gray-200 text-gray-700';
+    }
+  };
+
+  const getAlertStatusIcon = (status) => {
+    switch(status) {
+      case 'LOW':
+        return '⚠️';
+      case 'NORMAL':
+        return '✅';
+      case 'HIGH':
+        return '⛔';
+      default:
+        return 'ℹ️';
+    }
+  };
+
+  const getBMICategory = (bmi) => {
+    if (!bmi) return 'N/A';
+    if (bmi < 18.5) return 'Thiếu cân';
+    if (bmi < 25) return 'Bình thường'; 
+    if (bmi < 30) return 'Thừa cân';
+    return 'Béo phì';
+  };
+
+  // Màu sắc cho từng phân loại BMI
+  const getBMIColorClass = (bmi) => {
+    if (!bmi) return 'text-gray-500';
+    if (bmi < 18.5) return 'text-blue-600';
+    if (bmi < 25) return 'text-green-600';
+    if (bmi < 30) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   return (
@@ -182,11 +219,45 @@ const GrowthUpdate = () => {
             {isEditing ? 'Cập Nhật Thông Tin Thai Kỳ' : 'Thêm Thông Tin Thai Kỳ'}
           </h2>
 
+          {/* Hiển thị BMI và cảnh báo nếu có */}
+          {isEditing && (
+            <div className="mb-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-blue-700 font-medium mb-1">BMI trước thai kỳ</h3>
+                  <p className="text-xl font-semibold">{preBMI ? Math.round(preBMI) : 'N/A'}</p>
+                  <p className={`text-sm ${getBMIColorClass(preBMI)}`}>
+                    {getBMICategory(preBMI)}
+                  </p>
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-blue-700 font-medium mb-1">BMI hiện tại</h3>
+                   {/* chinh so BMI theo hang chuc */}
+                  <p className="text-xl font-semibold">{currentBMI ? Math.round(currentBMI) : 'N/A'}</p>
+                  <p className={`text-sm ${getBMIColorClass(currentBMI)}`}>
+                    {getBMICategory(currentBMI)}
+                  </p>
+                </div>
+              </div>
+              
+              {weightWarning && (
+                <div className={`p-4 border rounded-lg ${getAlertStatusColor(alertStatus)}`}>
+                  <div className="flex items-start">
+                    <span className="mr-2 text-xl">{getAlertStatusIcon(alertStatus)}</span>
+                    <div>
+                      <h3 className="font-medium">Tình trạng: {alertStatus === 'NORMAL' ? 'Bình thường' : alertStatus === 'LOW' ? 'Thấp' : 'Cao'}</h3>
+                      <p>{translateWarning(weightWarning)}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <Form 
             form={form} 
             layout="vertical" 
             onFinish={onFinish}
-            onValuesChange={handleFormChange}
             className="space-y-4"
           >
             <div className="flex flex-col space-y-4">
@@ -199,17 +270,17 @@ const GrowthUpdate = () => {
               </Form.Item>
 
               <Form.Item
-                label="Cân Nặng Thai (g)"
+                label="Cân Nặng Hiện Tại (kg)"
                 name="pregnancyWeight"
-                rules={[{ required: true, message: 'Vui lòng nhập cân nặng thai!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập cân nặng hiện tại!' }]}
               >
                 <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
               </Form.Item>
 
               <Form.Item
-                label="Chiều Cao Thai (mm)"
+                label="Chiều Cao Hiện Tại (cm)"
                 name="pregnancyHeight"
-                rules={[{ required: true, message: 'Vui lòng nhập chiều cao thai!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập chiều cao hiện tại!' }]}
               >
                 <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
               </Form.Item>
@@ -229,13 +300,14 @@ const GrowthUpdate = () => {
               >
                 <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
               </Form.Item>
+              
+              <Form.Item
+                label="Ghi chú"
+                name="notes"
+              >
+                <Input.TextArea rows={4} className="rounded-md w-full" />
+              </Form.Item>
             </div>
-
-            {weightWarning && (
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 mt-4">
-                ⚠️ {weightWarning}
-              </div>
-            )}
 
             <Form.Item className="text-center mt-8">
               <button
@@ -254,4 +326,4 @@ const GrowthUpdate = () => {
   );
 };
 
-export default GrowthUpdate
+export default GrowthUpdate;
