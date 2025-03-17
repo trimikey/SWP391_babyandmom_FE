@@ -19,6 +19,7 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const navigate = useNavigate()
   const dispatch = useDispatch();
 
@@ -42,6 +43,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoginError("");
+    
     if (validateForm()) {
       setIsLoading(true);
       
@@ -78,7 +81,12 @@ const LoginPage = () => {
         }
       } catch (err) {
         console.error('Error:', err);
-        toast.error('Đăng nhập thất bại');
+        if (err.response) {
+          setLoginError("Email hoặc mật khẩu không đúng");
+        } else {
+          setLoginError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.");
+        }
+       
       } finally {
         setIsLoading(false);
       }
@@ -91,6 +99,10 @@ const LoginPage = () => {
       ...prev,                                  
       [name]: type === "checkbox" ? checked : value,
     }));
+    
+    if (loginError && (name === 'email' || name === 'password')) {
+      setLoginError("");
+    }
   };
 
   return (
@@ -133,7 +145,7 @@ const LoginPage = () => {
                   autoComplete="email"
                   required
                   className={`appearance-none rounded-lg relative block w-full pl-10 pr-3 py-2 border ${
-                    errors.email ? "border-red-300" : "border-gray-300"
+                    errors.email || loginError ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm`}
                   placeholder="Nhập email của bạn"
                   value={formData.email}
@@ -146,8 +158,8 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                Mật khẩu
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -160,9 +172,9 @@ const LoginPage = () => {
                   autoComplete="current-password"
                   required
                   className={`appearance-none rounded-lg relative block w-full pl-10 pr-10 py-2 border ${
-                    errors.password ? "border-red-300" : "border-gray-300"
+                    errors.password || loginError ? "border-red-300" : "border-gray-300"
                   } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm`}
-                  placeholder="Enter your password"
+                  placeholder="Nhập mật khẩu của bạn"
                   value={formData.password}
                   onChange={handleChange}
                   aria-invalid={errors.password ? "true" : "false"}
@@ -186,13 +198,14 @@ const LoginPage = () => {
                 </p>
               )}
             </div>
-          
-
-            
-          
-
-          
           </div>
+          
+          {loginError && (
+            <div className="rounded-md bg-red-50 p-2">
+              <p className="text-sm text-center font-medium text-red-600">{loginError}</p>
+            </div>
+          )}
+          
           <div className="text-sm text-right text-black-400 hover:text-pink-500 " >
               <Link to="/forgot-password" >
                 Quên mật khẩu?
@@ -213,7 +226,6 @@ const LoginPage = () => {
                 Đăng ký ngay
               </Link>
               </div>  
-             
           </div>
         </form>
       </div>

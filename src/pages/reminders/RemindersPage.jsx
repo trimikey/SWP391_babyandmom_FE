@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag, Alert } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MailOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import api from '../../config/axios';
 import { useNavigate } from 'react-router-dom';
-import locale from 'antd/es/date-picker/locale/vi_VN';
-import 'moment/locale/vi';
 
-const { TextArea } = Input;
 const { Option } = Select;
+const { TextArea } = Input;
 
 // Ánh xạ loại nhắc nhở sang tiếng Việt
 const reminderTypeLabels = {
@@ -21,122 +20,190 @@ const reminderTypeLabels = {
 
 // Màu sắc cho các loại nhắc nhở
 const reminderTypeColors = {
-  DOCTOR_APPOINTMENT: 'blue',
+  DOCTOR_APPOINTMENT: 'purple',
   VACCINATION: 'green',
-  MEDICAL_TEST: 'purple',
+  MEDICAL_TEST: 'blue',
   PRENATAL_CHECKUP: 'orange',
-  CUSTOM: 'gray'
+  CUSTOM: 'cyan'
 };
 
 // Cấu hình moment sử dụng locale tiếng Việt
 moment.locale('vi');
 
 const RemindersPage = () => {
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [reminderTypes, setReminderTypes] = useState([]);
-  const [pregnancyProfiles, setPregnancyProfiles] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingReminder, setEditingReminder] = useState(null);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-  });
+  const [reminderTypes, setReminderTypes] = useState([]);
+  const [pregnancyProfiles, setPregnancyProfiles] = useState([]);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [currentUser, setCurrentUser] = useState(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const [form] = Form.useForm();
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [checkingPremium, setCheckingPremium] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    let isActive = true;
-    
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        message.error('Vui lòng đăng nhập để xem lời nhắc');
-        navigate('/login');
-        return;
-      }
-      
       try {
-        const response = await api.get('/user/profile', {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          message.error('Vui lòng đăng nhập để xem lời nhắc');
+          navigate('/login');
+          return;
+        }
+
+        const userResponse = await api.get('/user/profile', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (isActive) {
-          setCurrentUser(response.data);
-          setIsMounted(true);
+
+        console.log('User profile data:', userResponse.data);
+
+        if (userResponse.data) {
+          setCurrentUser(userResponse.data);
+          
+          await checkMembershipStatus(token);
         }
       } catch (error) {
         console.error('Auth error:', error);
-        if (isActive) {
-          message.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
-          localStorage.removeItem('token');
-          navigate('/login');
+        message.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
+        localStorage.removeItem('token');
+        navigate('/login');
+      }
+    };
+
+    checkAuth();
+
+    const onFocus = () => {
+      if (currentUser) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          checkMembershipStatus(token);
         }
       }
     };
-    
-    checkAuth();
-    
-    return () => {
-      isActive = false;
-    };
+
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, [navigate]);
 
-  useEffect(() => {
-    if (isMounted && currentUser) {
-      fetchReminders();
-      fetchReminderTypes();
-      fetchPregnancyProfiles();
+  const checkMembershipStatus = async (token) => {
+    try {
+      setCheckingPremium(true);
+      
+      // First try the membership status endpoint
+      try {
+        const membershipResponse = await api.get('/reminder/membership/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        console.log('Membership status:', membershipResponse.data);
+        
+        if (membershipResponse.data && membershipResponse.data.isPremium === true) {
+          setIsPremiumUser(true);
+          fetchReminderTypes();
+          fetchPregnancyProfiles();
+          fetchReminders();
+          return;
+        }
+      } catch (membershipError) {
+        console.error('Error checking membership status:', membershipError);
+      }
+      
+      // Fallback: Check orders for premium purchase using available endpoints
+      try {
+        // Log the current user info to debug
+        const userResponse = await api.get('/user/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        console.log('Current user:', userResponse.data);
+        
+        // Get all orders for the current user
+        const ordersResponse = await api.get('/order/all', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        console.log('User orders:', ordersResponse.data);
+        
+        // Look for any PAID or ACTIVE order with premium package
+        const hasPaidPremiumOrder = ordersResponse.data && 
+          Array.isArray(ordersResponse.data) && 
+          ordersResponse.data.some(order => {
+            // Check if order is paid and contains premium subscription
+            const orderIsPaid = order.status === 'PAID';
+            console.log(`Order ${order.id} status: ${order.status} - isPaid: ${orderIsPaid}`);
+            
+            // Check all possible ways the premium info might be stored
+            const isPremiumPackage = 
+              // Check if subscription exists and has package info
+              (order.subscription && 
+               order.subscription.membershipPackage && 
+               order.subscription.membershipPackage.type === 'PREMIUM') ||
+              // Or check direct packageType field
+              order.packageType === 'PREMIUM' ||
+              // Or check type field
+              order.type === 'PREMIUM';
+            
+            console.log(`Order ${order.id} isPremium: ${isPremiumPackage}`);
+            
+            return orderIsPaid && isPremiumPackage;
+          });
+        
+        console.log('Has paid premium order:', hasPaidPremiumOrder);
+        
+        setIsPremiumUser(hasPaidPremiumOrder);
+        
+        if (hasPaidPremiumOrder) {
+          fetchReminderTypes();
+          fetchPregnancyProfiles();
+          fetchReminders();
+        } else {
+          message.warning('Tính năng nhắc nhở chỉ dành cho người dùng gói PREMIUM');
+        }
+      } catch (orderError) {
+        console.error('Error checking orders:', orderError);
+        setIsPremiumUser(false);
+        message.warning('Không thể xác định trạng thái gói PREMIUM');
+      }
+    } finally {
+      setCheckingPremium(false);
     }
-  }, [isMounted, currentUser]);
-
-  useEffect(() => {
-    const handleFocus = () => {
-      if (isMounted && currentUser) {
-        fetchReminders();
-      }
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && isMounted && currentUser) {
-        fetchReminders();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [isMounted, currentUser]);
+  };
 
   const fetchReminders = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const token = localStorage.getItem('token');
-      if (!token) return;
-      
       const timestamp = new Date().getTime();
+      
       const response = await api.get(`/reminder?t=${timestamp}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-        params: { cache: false }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       
       console.log('Fetched reminders:', response.data);
       
       if (response.data && Array.isArray(response.data)) {
-        setReminders(response.data);
+        if (pregnancyProfiles.length > 0) {
+          const filteredReminders = response.data.filter(reminder => 
+            pregnancyProfiles.some(profile => profile.id === reminder.pregnancyId)
+          );
+          setReminders(filteredReminders);
+        } else {
+          setReminders(response.data);
+        }
       } else {
+        console.error('Invalid reminders data format:', response.data);
         setReminders([]);
       }
     } catch (error) {
       console.error('Error fetching reminders:', error);
-      message.error('Không thể tải danh sách lời nhắc');
+      if (error.response && error.response.status === 403) {
+        message.error('Bạn cần nâng cấp lên gói PREMIUM để sử dụng tính năng này');
+        setIsPremiumUser(false);
+      } else {
+        message.error('Không thể tải danh sách lời nhắc');
+      }
       setReminders([]);
     } finally {
       setLoading(false);
@@ -145,25 +212,18 @@ const RemindersPage = () => {
 
   const fetchReminderTypes = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('/reminder/enum/types', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      // Since there's no API endpoint for reminder types, use hardcoded values
+      const defaultTypes = [
+        'DOCTOR_APPOINTMENT',
+        'VACCINATION',
+        'MEDICAL_TEST',
+        'PRENATAL_CHECKUP',
+        'CUSTOM'
+      ];
       
-      if (response.data && Array.isArray(response.data)) {
-        setReminderTypes(response.data);
-      } else {
-        console.error('Invalid reminder types format:', response.data);
-        setReminderTypes([
-          'DOCTOR_APPOINTMENT',
-          'VACCINATION',
-          'MEDICAL_TEST',
-          'PRENATAL_CHECKUP',
-          'CUSTOM'
-        ]);
-      }
+      setReminderTypes(defaultTypes);
     } catch (error) {
-      console.error('Error fetching reminder types:', error);
+      console.error('Error setting reminder types:', error);
       setReminderTypes([
         'DOCTOR_APPOINTMENT',
         'VACCINATION',
@@ -183,6 +243,10 @@ const RemindersPage = () => {
       
       if (response.data && Array.isArray(response.data)) {
         setPregnancyProfiles(response.data);
+        
+        if (reminders.length > 0) {
+          fetchReminders();
+        }
       }
     } catch (error) {
       console.error('Error fetching pregnancy profiles:', error);
@@ -190,6 +254,11 @@ const RemindersPage = () => {
   };
 
   const showAddModal = () => {
+    if (!isPremiumUser) {
+      message.warning('Tính năng này chỉ dành cho người dùng gói PREMIUM');
+      return;
+    }
+    
     setEditingReminder(null);
     form.resetFields();
     form.setFieldsValue({
@@ -234,11 +303,19 @@ const RemindersPage = () => {
         });
       }
       await fetchReminders();
-      message.success(editingReminder ? 'Cập nhật lời nhắc thành công' : 'Tạo lời nhắc thành công');
+      message.success(editingReminder 
+        ? 'Cập nhật lời nhắc thành công' 
+        : 'Tạo lời nhắc thành công. Bạn sẽ nhận được email nhắc nhở vào ngày đã chọn.');
       handleCancel();
     } catch (error) {
       console.error('Error saving reminder:', error);
-      message.error('Có lỗi xảy ra khi lưu lời nhắc');
+      if (error.response && error.response.status === 403) {
+        message.error('Bạn cần nâng cấp lên gói PREMIUM để sử dụng tính năng này');
+        setIsPremiumUser(false);
+        setIsModalVisible(false);
+      } else {
+        message.error('Có lỗi xảy ra khi lưu lời nhắc');
+      }
     }
   };
 
@@ -252,7 +329,12 @@ const RemindersPage = () => {
       message.success('Xóa lời nhắc thành công');
     } catch (error) {
       console.error('Error deleting reminder:', error);
-      message.error('Có lỗi xảy ra khi xóa lời nhắc');
+      if (error.response && error.response.status === 403) {
+        message.error('Bạn cần nâng cấp lên gói PREMIUM để sử dụng tính năng này');
+        setIsPremiumUser(false);
+      } else {
+        message.error('Có lỗi xảy ra khi xóa lời nhắc');
+      }
     }
   };
 
@@ -322,6 +404,65 @@ const RemindersPage = () => {
     superPrevIcon: null,
   };
 
+  if (checkingPremium) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <Card title="Quản lý lời nhắc" className="shadow-md">
+          <div className="py-8 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+            </div>
+            <p className="text-gray-500">Đang kiểm tra quyền truy cập...</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isPremiumUser) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <Card title="Quản lý lời nhắc" className="shadow-md">
+          <div className="py-8 text-center">
+            <div className="text-5xl text-gray-300 mb-4">
+              <MailOutlined />
+            </div>
+            <h3 className="text-xl font-medium mb-4">Tính năng chỉ dành cho gói PREMIUM</h3>
+            <p className="text-gray-500 mb-6">
+              Tính năng nhắc nhở qua email chỉ dành cho người dùng gói PREMIUM. 
+              Nâng cấp ngay để theo dõi thai kỳ hiệu quả hơn với hệ thống nhắc nhở thông minh.
+            </p>
+            <div className="space-y-4">
+              <ul className="text-left max-w-md mx-auto mb-6">
+                <li className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span> Nhắc lịch khám thai định kỳ
+                </li>
+                <li className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span> Nhắc lịch tiêm chủng
+                </li>
+                <li className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span> Nhắc lịch xét nghiệm
+                </li>
+                <li className="flex items-center mb-2">
+                  <span className="text-green-500 mr-2">✓</span> Nhắc nhở tùy chỉnh
+                </li>
+                <li className="flex items-center">
+                  <span className="text-green-500 mr-2">✓</span> Nhận email nhắc nhở trước 1 ngày và trong ngày
+                </li>
+              </ul>
+              <button
+                onClick={() => navigate('/membership')}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg font-medium"
+              >
+                Nâng cấp lên PREMIUM ngay
+              </button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6 px-4">
       <Card
@@ -331,12 +472,26 @@ const RemindersPage = () => {
             type="primary" 
             icon={<PlusOutlined />} 
             onClick={showAddModal}
-            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-1 px-2   rounded-lg"
+            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-1 px-2 rounded-lg"
           >
             Thêm lời nhắc
           </button>
         }
       >
+        <Alert
+          message="Tính năng email nhắc nhở PREMIUM"
+          description={
+            <p>
+              Hệ thống sẽ tự động gửi email nhắc nhở cho bạn vào lúc 8:00 sáng trong ngày diễn ra lời nhắc,
+              và 20:00 tối hôm trước để bạn có thể chuẩn bị. Hãy đảm bảo email của bạn chính xác.
+            </p>
+          }
+          type="success"
+          showIcon
+          icon={<MailOutlined />}
+          className="mb-4"
+        />
+        
         <Table
           columns={columns}
           dataSource={reminders}

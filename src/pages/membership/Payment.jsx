@@ -61,11 +61,6 @@ const Payment = () => {
       }
 
       // Bước 1: Tạo đơn hàng
-      const orderData = {
-        type: location.state.packageType,
-        buyerEmail: userProfile.email
-      };
-      
       const orderResponse = await api.post(`/order/create?membershipType=${location.state.packageType}`, null, {
         headers: {
           'Authorization': `Bearer ${currentToken}`
@@ -95,6 +90,10 @@ const Payment = () => {
       }
       
       // Bước 3: Chuyển hướng người dùng đến trang thanh toán PayOS
+      // Lưu orderId vào localStorage để sử dụng khi quay lại
+      localStorage.setItem('pendingOrderId', orderId);
+      
+      // Chuyển hướng đến trang thanh toán
       window.location.href = checkoutResponse.data.checkoutUrl;
       
     } catch (error) {

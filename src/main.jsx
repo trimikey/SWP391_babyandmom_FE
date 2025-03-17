@@ -31,6 +31,7 @@ import BlogDetail from "./pages/blog/BlogDetail.jsx";
 import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
 import OrderManagement from "./pages/admin/OrderManagement.jsx";
 import RemindersPage from "./pages/reminders/RemindersPage.jsx";
+import CommentManagement from "./pages/admin/CommentManagement.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -156,6 +157,10 @@ const router = createBrowserRouter([
         {
           path: '/dashboard/blog',
           element: <BlogManagement />,
+        },
+        {
+          path: '/dashboard/comment',
+          element: <CommentManagement />,
         },
       
 

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../../config/axios';
 import logoImage from '../../assets/logo.jpg';
+import { message } from 'antd';
 import { 
-
   FaSignOutAlt, 
   FaCaretDown, 
   FaUserCircle, // Icon thông tin cá nhân
