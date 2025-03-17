@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button, Space, message, Modal } from 'antd';
+import { Table, Tag, Button, Space, message, Modal, Tooltip } from 'antd';
 import api from '../../config/axios';
+import { DeleteOutlined } from '@ant-design/icons';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -35,15 +36,39 @@ const OrderManagement = () => {
     CANCELED: 'gray'
   };
 
-  // Handle order deletion
-  const handleDelete = async (orderId) => {
+  // Handle order deletion - Cải tiến để xử lý tốt hơn
+  const handleDelete = async (orderId, status) => {
     try {
+      // Xóa đơn hàng thông qua API
       await api.delete(`/order/${orderId}`);
       message.success('Xóa đơn hàng thành công');
       fetchOrders();
     } catch (error) {
-      message.error('Không thể xóa đơn hàng');
-      console.error(error);
+      console.error('Deletion error:', error);
+      
+      // Nếu backend không cho phép xóa đơn hàng đã thanh toán
+      if (status === 'PAID') {
+        Modal.confirm({
+          title: 'Đơn hàng đã thanh toán',
+          content: 'Đơn hàng này đã được thanh toán. Bạn có muốn xóa vĩnh viễn không?',
+          okText: 'Xóa vĩnh viễn',
+          okType: 'danger',
+          cancelText: 'Hủy',
+          onOk: async () => {
+            try {
+              // Gọi API xóa vĩnh viễn đơn hàng
+              await api.delete(`/order/remove/${orderId}`);
+              message.success('Đã xóa vĩnh viễn đơn hàng');
+              fetchOrders();
+            } catch (removeError) {
+              message.error('Không thể xóa vĩnh viễn: ' + (removeError.response?.data || removeError.message));
+              console.error(removeError);
+            }
+          }
+        });
+      } else {
+        message.error('Không thể xóa đơn hàng: ' + (error.response?.data || error.message));
+      }
     }
   };
 
@@ -144,7 +169,7 @@ const OrderManagement = () => {
             Hủy
           </Button>
           <Button 
-            onClick={() => handleDelete(record.id)}
+            onClick={() => handleDelete(record.id, record.status)}
             danger
           >
             Xóa

@@ -60,19 +60,42 @@ const Payment = () => {
         return;
       }
 
-      const orderData = {
-        type: location.state.packageType,
-        buyerEmail: userProfile.email
-      };
-      console.log(orderData);
-      const response = await api.post(`/order/create?membershipType=${location.state.packageType}`);
-      console.log(response);
-      if (response) {
-        message.success('Đăng ký gói thành công!');
-        setTimeout(() => {
-          navigate('/');
-        }, 1500);
+      // Bước 1: Tạo đơn hàng
+      const orderResponse = await api.post(`/order/create?membershipType=${location.state.packageType}`, null, {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`
+        }
+      });
+      
+      if (!orderResponse || !orderResponse.data || !orderResponse.data.id) {
+        throw new Error('Không thể tạo đơn hàng');
       }
+      
+      // Lấy ID đơn hàng từ response
+      const orderId = orderResponse.data.id;
+      
+      // Bước 2: Gọi API checkout để lấy link thanh toán
+      const checkoutResponse = await api.post('/payment/checkout', 
+        { orderId: orderId },
+        {
+          headers: {
+            'Authorization': `Bearer ${currentToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (!checkoutResponse || !checkoutResponse.data || !checkoutResponse.data.checkoutUrl) {
+        throw new Error('Không thể tạo link thanh toán');
+      }
+      
+      // Bước 3: Chuyển hướng người dùng đến trang thanh toán PayOS
+      // Lưu orderId vào localStorage để sử dụng khi quay lại
+      localStorage.setItem('pendingOrderId', orderId);
+      
+      // Chuyển hướng đến trang thanh toán
+      window.location.href = checkoutResponse.data.checkoutUrl;
+      
     } catch (error) {
       console.error('Error details:', error.response || error);
       

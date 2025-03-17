@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Switch, message } from 'antd';
+import { Table, Button, Modal, Form, Input, Switch, message, Space } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
+
+const { confirm } = Modal;
+const { TextArea } = Input;
 
 const FAQManagement = () => {
   const [faqs, setFaqs] = useState([]);
@@ -51,14 +55,22 @@ const FAQManagement = () => {
       title: 'Thao tác',
       key: 'action',
       render: (_, record) => (
-        <span>
-          <Button type="link" onClick={() => handleEdit(record)}>
+        <Space size="small">
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            type="primary"
+          >
             Sửa
           </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.id)}>
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+            danger
+          >
             Xóa
           </Button>
-        </span>
+        </Space>
       ),
     },
   ];
@@ -89,15 +101,25 @@ const FAQManagement = () => {
     setIsModalVisible(true);
   };
 
-  // Handle delete
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/faqs/${id}`);
-      message.success('Xóa FAQ thành công');
-      fetchFAQs();
-    } catch (error) {
-      message.error('Không thể xóa FAQ');
-    }
+  // Handle delete với xác nhận
+  const handleDelete = (id) => {
+    confirm({
+      title: 'Bạn có chắc chắn muốn xóa FAQ này?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Hành động này không thể hoàn tác',
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      async onOk() {
+        try {
+          await api.delete(`/faqs/${id}`);
+          message.success('Xóa FAQ thành công');
+          fetchFAQs();
+        } catch (error) {
+          message.error('Không thể xóa FAQ');
+        }
+      },
+    });
   };
 
   return (
@@ -106,6 +128,7 @@ const FAQManagement = () => {
         <h1 className="text-2xl font-bold">Quản lý FAQ</h1>
         <Button 
           type="primary"
+          icon={<PlusOutlined />}
           onClick={() => {
             setEditingFaq(null);
             form.resetFields();
@@ -131,6 +154,7 @@ const FAQManagement = () => {
           setEditingFaq(null);
         }}
         footer={null}
+        width={700}
       >
         <Form
           form={form}
@@ -151,7 +175,7 @@ const FAQManagement = () => {
             label="Mô tả"
             rules={[{ required: true, message: 'Vui lòng nhập mô tả' }]}
           >
-            <Input.TextArea rows={4} />
+            <TextArea rows={4} />
           </Form.Item>
 
           <Form.Item
@@ -170,7 +194,7 @@ const FAQManagement = () => {
             <Switch />
           </Form.Item>
 
-          <Form.Item className="text-right">
+          <Form.Item className="flex justify-end">
             <Button type="default" className="mr-2" onClick={() => setIsModalVisible(false)}>
               Hủy
             </Button>

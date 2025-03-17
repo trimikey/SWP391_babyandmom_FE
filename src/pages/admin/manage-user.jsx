@@ -1,79 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Modal, Form, Input, message, Popconfirm } from 'antd';
+import { Table, Button, Modal, Form, Input, Select, message, Popconfirm, Space, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
 
-function ManageUser() {
+const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [form] = Form.useForm();
+  const [addForm] = Form.useForm();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
+  // Lấy danh sách người dùng
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const response = await api.get('/user');
       setUsers(response.data);
     } catch (error) {
+      console.error('Failed to fetch users:', error);
       message.error('Không thể tải danh sách người dùng');
-    }
-  };
-
-  const handleAdd = () => {
-    setEditingUser(null);
-    form.resetFields();
-    setIsModalVisible(true);
-  };
-
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    form.setFieldsValue(user);
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (userId) => {
-    try {
-      await api.delete(`/user/${userId}`);
-      message.success('Xóa người dùng thành công');
-      fetchUsers();
-    } catch (error) {
-      message.error('Không thể xóa người dùng');
-    }
-  };
-
-  const handleModalOk = async () => {
-    try {
-      const values = await form.validateFields();
-      setLoading(true);
-
-      if (editingUser) {
-        await api.put(`/user/${editingUser.id}`, values);
-        message.success('Cập nhật người dùng thành công');
-      } else {
-        await api.post('/user', values);
-        message.success('Thêm người dùng thành công');
-      }
-
-      setIsModalVisible(false);
-      form.resetFields();
-      fetchUsers();
-    } catch (error) {
-      message.error('Có lỗi xảy ra');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Hiển thị modal chỉnh sửa
+  const showEditModal = (user) => {
+    setSelectedUser(user);
+    form.setFieldsValue({
+      fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
+      phone: user.phone,
+      status: user.status
+    });
+    setEditModalVisible(true);
+  };
+
+  // Hiển thị modal thêm mới
+  const showAddModal = () => {
+    addForm.resetFields();
+    setAddModalVisible(true);
+  };
+
+  // Cập nhật người dùng
+  const handleUpdate = async (values) => {
+    try {
+      await api.put(`/user/${selectedUser.id}`, values);
+      message.success('Cập nhật thông tin thành công');
+      setEditModalVisible(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      message.error('Cập nhật thông tin thất bại');
+    }
+  };
+
+  // Thêm người dùng mới
+  const handleAdd = async (values) => {
+    try {
+      // Đây là giả định API endpoint, backend của bạn cần có API này
+      await api.post('/user/register', {
+        ...values,
+        role: 'MEMBER'
+      });
+      message.success('Thêm người dùng thành công');
+      setAddModalVisible(false);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to add user:', error);
+      message.error('Thêm người dùng thất bại');
+    }
+  };
+
+  // Cập nhật trạng thái người dùng
+  const handleStatusChange = async (userId, status) => {
+    try {
+      await api.put(`/user/${userId}/status`, { status });
+      message.success('Cập nhật trạng thái thành công');
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update user status:', error);
+      message.error('Cập nhật trạng thái thất bại');
+    }
+  };
+
+  // Xóa người dùng (thực tế là cập nhật trạng thái BAN)
+  const handleDelete = async (userId) => {
+    try {
+      await api.delete(`/user/${userId}`);
+      message.success('Người dùng đã bị cấm');
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to ban user:', error);
+      message.error('Không thể cấm người dùng');
+    }
+  };
+
+  // Render tag màu theo trạng thái
+  const renderStatusTag = (status) => {
+    let color = 'green';
+    if (status === 'UNVERIFIED') color = 'orange';
+    if (status === 'BANNED' || status === 'BAN') color = 'red';
+    
+    return (
+      <Tag color={color}>
+        {status === 'VERIFIED' ? 'Đã xác minh' : 
+         status === 'UNVERIFIED' ? 'Chưa xác minh' : 
+         status === 'BANNED' || status === 'BAN' ? 'Bị cấm' : status}
+      </Tag>
+    );
+  };
+
   const columns = [
     {
-      title: 'Tên',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      title: 'Họ tên',
+      dataIndex: 'fullName',
+      key: 'fullName',
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
     },
     {
       title: 'Tên người dùng',
@@ -87,37 +137,41 @@ function ManageUser() {
     },
     {
       title: 'Số điện thoại',
-      dataIndex: 'phoneNumber',
-      key: 'phoneNumber',
+      dataIndex: 'phone',
+      key: 'phone',
     },
     {
-      title: 'Vai trò',
-      dataIndex: 'role',
-      key: 'role',
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: renderStatusTag,
+      filters: [
+        { text: 'Đã xác minh', value: 'VERIFIED' },
+        { text: 'Chưa xác minh', value: 'UNVERIFIED' },
+        { text: 'Bị cấm', value: 'BAN' },
+      ],
+      onFilter: (value, record) => record.status === value,
     },
     {
       title: 'Thao tác',
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
+          <Button 
+            type="primary" 
+            icon={<EditOutlined />} 
+            onClick={() => showEditModal(record)}
           >
             Sửa
           </Button>
           <Popconfirm
-            title="Bạn có chắc chắn muốn xóa người dùng này?"
+            title="Cấm người dùng này?"
+            description="Hành động này sẽ cấm người dùng, bạn có chắc chắn không?"
             onConfirm={() => handleDelete(record.id)}
-            okText="Có"
-            cancelText="Không"
+            okText="Đồng ý"
+            cancelText="Hủy"
           >
-            <Button
-              type="primary"
-              danger
-              icon={<DeleteOutlined />}
-            >
+            <Button type="primary" danger icon={<DeleteOutlined />}>
               Xóa
             </Button>
           </Popconfirm>
@@ -127,51 +181,47 @@ function ManageUser() {
   ];
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Quản lý người dùng</h2>
-        <Button
-          type="primary"
-          icon={<UserAddOutlined />}
-          onClick={handleAdd}
+        <h1 className="text-2xl font-semibold">Quản lý người dùng</h1>
+        <Button 
+          type="primary" 
+          icon={<UserAddOutlined />} 
+          onClick={showAddModal}
+         
         >
           Thêm người dùng
         </Button>
       </div>
-      
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="id"
-        pagination={{ 
-          pageSize: 10,
-          showTotal: (total) => `Tổng số ${total} người dùng`,
-        }}
+
+      <Table 
+        columns={columns} 
+        dataSource={users} 
+        rowKey="id" 
         loading={loading}
+        pagination={{ pageSize: 10 }}
       />
 
+      {/* Modal chỉnh sửa người dùng */}
       <Modal
-        title={editingUser ? "Sửa thông tin người dùng" : "Thêm người dùng mới"}
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={() => {
-          setIsModalVisible(false);
-          form.resetFields();
-        }}
-        confirmLoading={loading}
+        title="Chỉnh sửa thông tin người dùng"
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        footer={null}
       >
         <Form
           form={form}
           layout="vertical"
+          onFinish={handleUpdate}
+          initialValues={selectedUser}
         >
           <Form.Item
-            name="name"
-            label="Tên"
-            rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+            name="fullName"
+            label="Họ tên"
+            rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
             name="userName"
             label="Tên người dùng"
@@ -179,7 +229,6 @@ function ManageUser() {
           >
             <Input />
           </Form.Item>
-
           <Form.Item
             name="email"
             label="Email"
@@ -190,29 +239,105 @@ function ManageUser() {
           >
             <Input />
           </Form.Item>
-
           <Form.Item
-            name="phoneNumber"
+            name="phone"
             label="Số điện thoại"
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Trạng thái"
+            rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+          >
+            <Select>
+              <Select.Option value="VERIFIED">Đã xác minh</Select.Option>
+              <Select.Option value="UNVERIFIED">Chưa xác minh</Select.Option>
+              <Select.Option value="BAN">Bị cấm</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item className="flex justify-end">
+            <Button type="default" onClick={() => setEditModalVisible(false)} style={{ marginRight: 8 }}>
+              Hủy
+            </Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#ff85a2', borderColor: '#ff85a2' }}>
+              Cập nhật
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Modal thêm người dùng mới */}
+      <Modal
+        title="Thêm người dùng mới"
+        open={addModalVisible}
+        onCancel={() => setAddModalVisible(false)}
+        footer={null}
+      >
+        <Form
+          form={addForm}
+          layout="vertical"
+          onFinish={handleAdd}
+        >
+          <Form.Item
+            name="fullName"
+            label="Họ tên"
+            rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="userName"
+            label="Tên người dùng"
+            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
             rules={[
-              { required: true, message: 'Vui lòng nhập số điện thoại!' },
-              { pattern: /^0\d{9}$/, message: 'Số điện thoại không hợp lệ!' }
+              { required: true, message: 'Vui lòng nhập email!' },
+              { type: 'email', message: 'Email không hợp lệ!' }
             ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="password"
-            label="password"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
-
+            label="Mật khẩu"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            name="phone"
+            label="Số điện thoại"
           >
             <Input />
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="Trạng thái"
+            initialValue="VERIFIED"
+          >
+            <Select>
+              <Select.Option value="VERIFIED">Đã xác minh</Select.Option>
+              <Select.Option value="UNVERIFIED">Chưa xác minh</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item className="flex justify-end">
+            <Button type="default" onClick={() => setAddModalVisible(false)} style={{ marginRight: 8 }}>
+              Hủy
+            </Button>
+            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#ff85a2', borderColor: '#ff85a2' }}>
+              Thêm
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
     </div>
   );
-}
+};
 
-export default ManageUser;
+export default UserManagement;

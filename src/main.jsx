@@ -24,11 +24,14 @@ import BlogManagement from "./pages/admin/BlogManagement.jsx";
 import Blog from "./pages/blog/Blog.jsx";
 import ForgotPassword from "./pages/login/ForgotPassword.jsx";
 import ChangePassword from "./pages/profiles/ChangePassword.jsx";
-import PaymentCallback from "./pages/membership/PaymentCallback.jsx";
 import Payment from "./pages/membership/Payment.jsx";
+import PaymentSuccess from "./pages/membership/PaymentSuccess.jsx";
+import PaymentCancel from "./pages/membership/PaymentCancel.jsx";
 import BlogDetail from "./pages/blog/BlogDetail.jsx";
 import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
 import OrderManagement from "./pages/admin/OrderManagement.jsx";
+import RemindersPage from "./pages/reminders/RemindersPage.jsx";
+import CommentManagement from "./pages/admin/CommentManagement.jsx";
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -66,18 +69,12 @@ const router = createBrowserRouter([
         element: <ParentingEducation/>
     
       },
-      {
-        path: "/payment-callback",
-        element: <PaymentCallback/>
-      },
+     
       {
         path: "/payment",
         element: <Payment/>
       },
-      {
-        path: "/blog-detail/:id",
-        element: <BlogDetail/>
-      },
+    
       {
         path: "growth-records/profile/",
         element: <GrowthUpdate />
@@ -86,7 +83,11 @@ const router = createBrowserRouter([
         path: "growth-records/profile/:id",
         element: <GrowthUpdate />
       },
-     
+      
+      {
+        path: "blog-detail/:id",
+        element: <BlogDetail />
+      },
       {
         path:"/faq",
         element: <FAQ/>
@@ -99,6 +100,22 @@ const router = createBrowserRouter([
         path: "/change-password",
         element: <ChangePassword/>
       },
+      {
+        path: "/reminders",
+        element: <RemindersPage/>
+      },
+      {
+        path: "/reminders/:id",
+        element: <RemindersPage/>
+      },
+    {
+      path: "/payment/success/:orderId",
+      element: <PaymentSuccess/>
+    },
+    {
+      path: "/payment/cancel",
+      element: <PaymentCancel/>
+    }
     ]
   },
 
@@ -140,6 +157,10 @@ const router = createBrowserRouter([
         {
           path: '/dashboard/blog',
           element: <BlogManagement />,
+        },
+        {
+          path: '/dashboard/comment',
+          element: <CommentManagement />,
         },
       
 
