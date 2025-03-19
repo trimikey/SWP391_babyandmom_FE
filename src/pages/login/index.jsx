@@ -12,8 +12,7 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false,
-    userName:""
+    userName:"",
   });
   
   const [errors, setErrors] = useState({});
@@ -53,12 +52,12 @@ const LoginPage = () => {
         console.log('Response:', response.data);
 
         if (response.data.accessToken) {  
-          const { accessToken, role, email,  userName } = response.data;
+          const { accessToken, role, email,  userName, id } = response.data;
           const decodedToken = jwtDecode(accessToken);
           
           // Lưu user vào Redux store
           const userData = {
-            id: decodedToken.id || decodedToken.sub, // Lấy id từ token
+            id: id, // Lấy id từ token
             email: email || decodedToken.sub,
             userName: userName || decodedToken.userName,
             role: role
@@ -78,6 +77,9 @@ const LoginPage = () => {
           } else {
             navigate('/');
           }
+
+          const userId = response.data.userId; // Adjust based on your response
+          localStorage.setItem('userId', userId);
         }
       } catch (err) {
         console.error('Error:', err);

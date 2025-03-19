@@ -16,9 +16,7 @@ const UserProfile = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await api.get('/user/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        
       });
 
       if (response.data) {

@@ -16,18 +16,20 @@ const GrowthUpdate = () => {
   const [preBMI, setPreBMI] = useState(null);
   const [currentBMI, setCurrentBMI] = useState(null);
   const [alertStatus, setAlertStatus] = useState(null);
+  const [minPregnancyWeek, setMinPregnancyWeek] = useState(1);
 
   useEffect(() => {
-    console.log('Current profileId:', profileId);
+    // console.log('Current profileId:', profileId);
     if (profileId) {
-      console.log('Fetching growth records for profileId:', profileId);
+      // console.log('Fetching growth records for profileId:', profileId);
       fetchGrowthRecords();
+      fetchPregnancyProfile();
     }
   }, [profileId]);
 
   useEffect(() => {
     // Set isEditing dựa vào id từ params
-    console.log('Current id:', id);
+    // console.log('Current id:', id);
     if (id) {
       setIsEditing(true);
       fetchGrowthRecordById(id);
@@ -42,9 +44,7 @@ const GrowthUpdate = () => {
           params: {
             profileId: profileId
           },
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          
         });
         
         console.log('Growth records response:', response.data);
@@ -71,9 +71,7 @@ const GrowthUpdate = () => {
     const token = localStorage.getItem('token');
     try {
       const response = await api.get(`/growth-records/${recordId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+       
       }); 
       const recordToEdit = response.data;
       if (recordToEdit) {
@@ -107,6 +105,12 @@ const GrowthUpdate = () => {
 
   const onFinish = async (values) => {
     try {
+      // Kiểm tra lại tuần thai trước khi submit
+      if (parseInt(values.pregnancyWeek) < minPregnancyWeek) {
+        message.error(`Tuần thai không thể nhỏ hơn tuần hiện tại (${minPregnancyWeek})`);
+        return;
+      }
+      
       setLoading(true);
       const requestData = {
         pregnancyWeek: Number(values.pregnancyWeek),
@@ -202,6 +206,44 @@ const GrowthUpdate = () => {
     return 'text-red-600';
   };
 
+  // Thêm hàm mới để lấy thông tin profile thai kỳ
+  const fetchPregnancyProfile = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      // Đầu tiên, lấy tất cả profiles
+      const response = await api.get(`/pregnancy-profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        console.log('Pregnancy profiles:', response.data);
+        
+        // Lọc profile theo profileId từ localStorage nếu có
+        let selectedProfile;
+        if (profileId) {
+          selectedProfile = response.data.find(profile => profile.id == profileId);
+        }
+        
+        // Nếu không tìm thấy, sử dụng profile đầu tiên
+        if (!selectedProfile && response.data.length > 0) {
+          selectedProfile = response.data[0];
+        }
+        
+        if (selectedProfile && selectedProfile.currentWeek) {
+          // console.log('Selected pregnancy profile:', selectedProfile);
+          setMinPregnancyWeek(selectedProfile.currentWeek);
+        }
+      } else {
+        console.warn('No pregnancy profiles found');
+      }
+    } catch (error) {
+      console.error('Error fetching pregnancy profiles:', error);
+      message.error('Không thể tải thông tin thai kỳ');
+    }
+  };
+
   return (
     <div className="min-h-screen relative">
       {/* Background với overlay */}
@@ -216,7 +258,7 @@ const GrowthUpdate = () => {
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="max-w-xl mx-auto bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-8">
           <h2 className="text-3xl font-semibold text-pink-600 mb-8 text-center">
-            {isEditing ? 'Cập Nhật Thông Tin Thai Kỳ' : 'Thêm Thông Tin Thai Kỳ'}
+            {isEditing ? 'Cập Nhật Thông Tin Thai Kỳ' : 'Cập nhật tăng trưởng'}
           </h2>
 
           {/* Hiển thị BMI và cảnh báo nếu có */}
@@ -264,9 +306,35 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Tuần Thai"
                 name="pregnancyWeek"
-                rules={[{ required: true, message: 'Vui lòng nhập tuần thai!' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập tuần thai!' },
+                  { 
+                    validator: (_, value) => {
+                      const weekValue = parseInt(value);
+                      if (isNaN(weekValue) || weekValue < minPregnancyWeek) {
+                        return Promise.reject(`Tuần thai phải từ tuần ${minPregnancyWeek} trở lên theo thông tin thai kỳ`);
+                      }
+                      return Promise.resolve();
+                    }
+                  }
+                ]}
               >
-                <Input type="number" min={1} max={42} className="rounded-md w-full" />
+                <Input 
+                  type="number" 
+                  min={minPregnancyWeek} 
+                  max={42} 
+                  className="rounded-md w-full"
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    if (value < minPregnancyWeek) {
+                      message.warning(`Tuần thai không thể nhỏ hơn tuần hiện tại (${minPregnancyWeek})`);
+                      // Đặt lại giá trị về minPregnancyWeek
+                      form.setFieldsValue({
+                        pregnancyWeek: minPregnancyWeek
+                      });
+                    }
+                  }}
+                />
               </Form.Item>
 
               <Form.Item

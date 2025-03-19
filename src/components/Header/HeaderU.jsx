@@ -17,7 +17,6 @@ const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false); // State for dropdown
   const [userName, setUserName] = useState('');
   const token = localStorage.getItem('token');
-  const [profile, setProfile] = useState(null);
   const [pregnancyProfile, setPregnancyProfile] = useState(null);
   const [pregnancyRecords, setPregnancyRecords] = useState(null);
   
@@ -32,8 +31,12 @@ const Header = () => {
           }
         });
         
+        console.log('Header User Profile:', response.data); // Thêm log này để kiểm tra
+        
         if (response.data) {
           setUserName(response.data.userName || 'Guest');
+          // Lưu lại thông tin user để sử dụng sau này
+          localStorage.setItem('userInfo', JSON.stringify(response.data));
           setIsLoggedIn(true);
         }
       } catch (error) {
@@ -84,18 +87,17 @@ const Header = () => {
       //   if (response.data && response.data.length > 0) {
       //     setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
        
-        // console.log('Pregnancy Profile Response:', response.data);
+        console.log('Pregnancy Profile Response:', response.data);
 
         if (response.data && response.data.length > 0) {
+
           setPregnancyProfile(response.data[0]);
           localStorage.setItem('profileId', response.data[0].id); // Lưu profileId vào localStorage
           
           // Fetch pregnancy records sau khi có profile
           try {
             const recordsResponse = await api.get(`/growth-records/current?profileId=${response.data[0].id}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
+            
             });
             setPregnancyRecords(recordsResponse.data);
           } catch (error) {
@@ -116,10 +118,10 @@ const Header = () => {
 
   const handleNavigation = (path) => {
     if (path === '/growth-records') {
-      console.log('PregnancyProfile:', pregnancyProfile);
+      // console.log('PregnancyProfile:', pregnancyProfile);
       console.log('PregnancyRecords:', pregnancyRecords);
       
-      if (pregnancyProfile?.id) {
+      if (pregnancyRecords) {
         if (pregnancyRecords && pregnancyRecords.length > 0) {
           navigate(`/growth-records/profile/${pregnancyRecords[pregnancyRecords.length - 1].id}`);
         } else {
@@ -243,6 +245,18 @@ const Header = () => {
                       >
                         <FaBell className="mr-3" />
                         Quản lý lời nhắc
+                      </button>
+
+                      {/* Add Transaction Menu Item */}
+                      <button
+                        onClick={() => {
+                          handleNavigation('/transactions');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      >
+                        <FaUserCircle className="mr-3" />
+                        Thông tin giao dịch
                       </button>
 
                       <div className="border-t border-gray-100 my-1"></div>

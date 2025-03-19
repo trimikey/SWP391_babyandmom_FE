@@ -20,50 +20,8 @@ const Homepage = () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const token = localStorage.getItem('token');
 
-    const checkPregnancyProfile = async () => {
-      try {
-        const response = await api.get('/pregnancy-profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        // Chỉ hiện thông báo nếu chưa có thông tin thai kỳ và hasProfile là false
-        if (response.data && response.data.hasProfile === false) {
-          Swal.fire({
-            title: 'Thêm thông tin thai kỳ',
-            text: 'Bạn chưa có thông tin thai kỳ. Bạn có muốn thêm thông tin ngay bây giờ không?',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonColor: '#EC4899',
-            cancelButtonColor: '#9CA3AF',
-            confirmButtonText: 'Thêm thông tin',
-            cancelButtonText: 'Để sau',
-            background: '#fff',
-            customClass: {
-              container: 'font-sans',
-              popup: 'rounded-lg',
-              title: 'text-xl text-gray-800 font-semibold',
-              content: 'text-gray-700',
-              confirmButton: 'rounded-lg text-sm font-medium',
-              cancelButton: 'rounded-lg text-sm font-medium'
-            }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate('/profile');
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Error in checkPregnancyProfile:', error);
-      }
-    };
-
     // Chỉ check profile nếu có userInfo và không phải ADMIN
-    if (userInfo && userInfo.role !== 'ADMIN') {
-      checkPregnancyProfile();
-    }
+   
 
     // Tải danh sách hồ sơ thai kỳ của người dùng
     

@@ -1,42 +1,14 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { Steps } from 'antd';
-
 import {
   FaEye,
   FaEyeSlash,
-
 } from "react-icons/fa";
-import { auth } from "../../config/firebase";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const description = 'This is a description.'
-const App = () => (
-  <Steps
-    current={1}
-    items={[
-      {
-        title: 'Finished',
-        description,
-      },
-      {
-        title: 'In Progress',
-        description,
-        subTitle: 'Left 00:00:08',
-      },
-      {
-        title: 'Waiting',
-        description,
-      },
-    ]}
-  />
-);
-
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: "",
     userName: "",
     phoneNumber: "",
     email: "",
@@ -61,9 +33,7 @@ const RegisterPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = "Tên là bắt buộc";
-    }
+    
     if (!formData.userName.trim()) {
       newErrors.userName = "Tên người dùng là bắt buộc";
     }
@@ -103,22 +73,15 @@ const RegisterPage = () => {
     let newErrors = { ...errors };
 
     switch (name) {
-      case "name":
-        if (!value) newErrors.name = "Tên là bắt buộc";
-        else if (value.length < 4)
-          newErrors.name = "Tên phải có ít nhất 2 ký tự";
-        else if (!/^[a-zA-Z0-9]+$/.test(value))
-          newErrors.userName = "Tên người dùng chỉ được nhập chữ cái và số";
-        else delete newErrors.name;
-        break;
+      
 
       case "userName":
         if (!value) newErrors.userName = "Tên người dùng là bắt buộc";
        
         else if (value.length > 20)
           newErrors.userName = "Tên người dùng không được vượt quá 20 ký tự";
-        else if (!/^[a-zA-Z0-9]+$/.test(value))
-          newErrors.userName = "Tên người dùng chỉ được nhập chữ cái và số";
+        else if (!/^[\p{L}\p{N}\s_-]+$/u.test(value))
+          newErrors.userName = "Tên người dùng chỉ được chứa chữ cái, số, dấu gạch ngang, gạch dưới và khoảng trắng";
         else delete newErrors.userName;
         break;
 
@@ -238,25 +201,7 @@ const RegisterPage = () => {
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Tên
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className={`appearance-none rounded-lg relative block w-full px-3 py-2 border ${errors.name ? "border-red-300" : "border-gray-300"
-                  } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm`}
-                placeholder="Nhập tên của bạn"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && (
-                <p className="mt-2 text-sm text-red-600">{errors.name}</p>
-              )}
-            </div>
+           
 
             <div>
               <label htmlFor="userName" className="block text-sm font-medium text-gray-700">

@@ -134,7 +134,6 @@ const RemindersPage = () => {
             const orderIsPaid = order.status === 'PAID';
             console.log(`Order ${order.id} status: ${order.status} - isPaid: ${orderIsPaid}`);
             
-            // Check all possible ways the premium info might be stored
             const isPremiumPackage = 
               // Check if subscription exists and has package info
               (order.subscription && 
@@ -294,13 +293,9 @@ const RemindersPage = () => {
       };
 
       if (editingReminder) {
-        await api.put(`/reminder/${editingReminder.id}`, data, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await api.put(`/reminder/${editingReminder.id}`, data)
       } else {
-        await api.post('/reminder', data, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await api.post('/reminder', data);
       }
       await fetchReminders();
       message.success(editingReminder 

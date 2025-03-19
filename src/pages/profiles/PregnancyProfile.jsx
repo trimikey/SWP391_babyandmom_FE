@@ -230,15 +230,15 @@ const PregnancyProfile = () => {
 
             <Form.Item
               name="height"
-              label="Chiều dài (cm)"
+              label="Chiều cao (cm)"
               rules={[
-                { required: true, message: 'Vui lòng nhập chiều dài' },
-                { type: 'number', min: 0.1, message: 'Chiều dài phải lớn hơn 0' }
+                { required: true, message: 'Vui lòng nhập chiều cao' },
+                { type: 'number', min: 0.1, message: 'Chiều cai phải lớn hơn 0' }
               ]}
             >
               <InputNumber 
                 className="w-full rounded-lg"
-                placeholder="Nhập chiều dài" 
+                placeholder="Nhập chiều cao" 
                 step={0.1}
                 precision={1}
                 min={0.1}

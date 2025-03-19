@@ -34,11 +34,7 @@ const BlogDetail = () => {
                 const user = localStorage.getItem('user');
                 
                 // Log để debug
-                console.log('Checking localStorage keys:');
-                console.log('token exists:', !!token);
-                console.log('userInfo exists:', !!storedUserInfo);
-                console.log('userDetails exists:', !!userDetails);
-                console.log('user exists:', !!user);
+              
                 console.log('userInfo:', storedUserInfo);
                 
                 // Thử các nguồn dữ liệu khác nhau

@@ -62,9 +62,7 @@ const Payment = () => {
 
       // Bước 1: Tạo đơn hàng
       const orderResponse = await api.post(`/order/create?membershipType=${location.state.packageType}`, null, {
-        headers: {
-          'Authorization': `Bearer ${currentToken}`
-        }
+       
       });
       
       if (!orderResponse || !orderResponse.data || !orderResponse.data.id) {
@@ -77,12 +75,7 @@ const Payment = () => {
       // Bước 2: Gọi API checkout để lấy link thanh toán
       const checkoutResponse = await api.post('/payment/checkout', 
         { orderId: orderId },
-        {
-          headers: {
-            'Authorization': `Bearer ${currentToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
+       
       );
       
       if (!checkoutResponse || !checkoutResponse.data || !checkoutResponse.data.checkoutUrl) {

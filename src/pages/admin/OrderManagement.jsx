@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button, Space, message, Modal, Tooltip } from 'antd';
+import { Table, Tag, Button, Space, message, Modal } from 'antd';
 import api from '../../config/axios';
-import { DeleteOutlined } from '@ant-design/icons';
+import moment from 'moment';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+
+  // Status color mapping
+  const statusColors = {
+    PENDING: 'gold',
+    PAID: 'blue',
+    ACTIVE: 'green',
+    EXPIRED: 'red',
+    CANCELED: 'gray'
+  };
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -27,67 +35,21 @@ const OrderManagement = () => {
     fetchOrders();
   }, []);
 
-  // Status color mapping
-  const statusColors = {
-    PENDING: 'gold',
-    PAID: 'blue',
-    ACTIVE: 'green',
-    EXPIRED: 'red',
-    CANCELED: 'gray'
-  };
-
-  // Handle order deletion - Cải tiến để xử lý tốt hơn
+  // Handle order deletion
   const handleDelete = async (orderId, status) => {
     try {
-      // Xóa đơn hàng thông qua API
       await api.delete(`/order/${orderId}`);
       message.success('Xóa đơn hàng thành công');
       fetchOrders();
     } catch (error) {
-      console.error('Deletion error:', error);
-      
-      // Nếu backend không cho phép xóa đơn hàng đã thanh toán
-      if (status === 'PAID') {
-        Modal.confirm({
-          title: 'Đơn hàng đã thanh toán',
-          content: 'Đơn hàng này đã được thanh toán. Bạn có muốn xóa vĩnh viễn không?',
-          okText: 'Xóa vĩnh viễn',
-          okType: 'danger',
-          cancelText: 'Hủy',
-          onOk: async () => {
-            try {
-              // Gọi API xóa vĩnh viễn đơn hàng
-              await api.delete(`/order/remove/${orderId}`);
-              message.success('Đã xóa vĩnh viễn đơn hàng');
-              fetchOrders();
-            } catch (removeError) {
-              message.error('Không thể xóa vĩnh viễn: ' + (removeError.response?.data || removeError.message));
-              console.error(removeError);
-            }
-          }
-        });
-      } else {
-        message.error('Không thể xóa đơn hàng: ' + (error.response?.data || error.message));
-      }
-    }
-  };
-
-  // Handle permanent removal
-  const handleRemove = async (orderId) => {
-    try {
-      await api.delete(`/order/remove/${orderId}`);
-      message.success('Đã xóa vĩnh viễn đơn hàng');
-      fetchOrders();
-    } catch (error) {
-      message.error('Không thể xóa vĩnh viễn đơn hàng');
-      console.error(error);
+      message.error('Không thể xóa đơn hàng: ' + (error.response?.data || error.message));
     }
   };
 
   // Handle order cancellation
   const handleCancel = async (orderId) => {
     try {
-      await api.put(`/order/cancel/${orderId}`);
+      await api.get(`/order/cancel/${orderId}`);
       message.success('Hủy đơn hàng thành công');
       fetchOrders();
     } catch (error) {
@@ -131,8 +93,17 @@ const OrderManagement = () => {
     },
     {
       title: 'Gói thành viên',
-      dataIndex: 'membershipType',
+      dataIndex: 'subscription',
       key: 'membershipType',
+      render: (subscription) => {
+        const membershipNames = {
+          'BASIC': 'Gói cơ bản',
+          'PREMIUM': 'Gói cao cấp',
+          'VIP': 'Gói VIP'
+        };
+        const type = subscription?.membershipPackage?.type;
+        return membershipNames[type] || type;
+      }
     },
     {
       title: 'Giá (VNĐ)',
@@ -169,7 +140,7 @@ const OrderManagement = () => {
             Hủy
           </Button>
           <Button 
-            onClick={() => handleDelete(record.id, record.status)}
+            onClick={() => handleDelete(record.id)}
             danger
           >
             Xóa
@@ -212,12 +183,17 @@ const OrderManagement = () => {
             <p><strong>Khách hàng:</strong> {selectedOrder.buyerName}</p>
             <p><strong>Email:</strong> {selectedOrder.buyerEmail}</p>
             <p><strong>Số điện thoại:</strong> {selectedOrder.buyerPhone}</p>
-            <p><strong>Gói thành viên:</strong> {selectedOrder.membershipType}</p>
+            <p><strong>Gói thành viên:</strong> {
+              {
+                'BASIC': 'Gói cơ bản',
+                'PREMIUM': 'Gói cao cấp',
+                'VIP': 'Gói VIP'
+              }[selectedOrder.subscription?.membershipPackage?.type] || selectedOrder.subscription?.membershipPackage?.type
+            }</p>
+            <p><strong>Thời hạn:</strong> {moment(selectedOrder.startDate).format('DD/MM/YYYY')} - {moment(selectedOrder.endDate).format('DD/MM/YYYY')}</p>
             <p><strong>Giá:</strong> {new Intl.NumberFormat('vi-VN').format(selectedOrder.totalPrice)} VNĐ</p>
             <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
-            <p><strong>Ngày tạo:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
-            <p><strong>Ngày bắt đầu:</strong> {new Date(selectedOrder.startDate).toLocaleString('vi-VN')}</p>
-            <p><strong>Ngày kết thúc:</strong> {new Date(selectedOrder.endDate).toLocaleString('vi-VN')}</p>
+            <p><strong>Ngày tạo:</strong> {moment(selectedOrder.createdAt).format('DD/MM/YYYY HH:mm')}</p>
           </div>
         )}
       </Modal>
