@@ -54,9 +54,7 @@ const RemindersPage = () => {
           return;
         }
 
-        const userResponse = await api.get('/user/profile', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const userResponse = await api.get('/user/profile');
 
         console.log('User profile data:', userResponse.data);
 
@@ -94,9 +92,7 @@ const RemindersPage = () => {
       
       // First try the membership status endpoint
       try {
-        const membershipResponse = await api.get('/reminder/membership/status', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const membershipResponse = await api.get('/reminder/membership/status');
         
         console.log('Membership status:', membershipResponse.data);
         
@@ -114,15 +110,11 @@ const RemindersPage = () => {
       // Fallback: Check orders for premium purchase using available endpoints
       try {
         // Log the current user info to debug
-        const userResponse = await api.get('/user/profile', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const userResponse = await api.get('/user/profile');
         console.log('Current user:', userResponse.data);
         
         // Get all orders for the current user
-        const ordersResponse = await api.get('/order/all', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const ordersResponse = await api.get('/order/all');
         
         console.log('User orders:', ordersResponse.data);
         
@@ -134,7 +126,6 @@ const RemindersPage = () => {
             const orderIsPaid = order.status === 'PAID';
             console.log(`Order ${order.id} status: ${order.status} - isPaid: ${orderIsPaid}`);
             
-            // Check all possible ways the premium info might be stored
             const isPremiumPackage = 
               // Check if subscription exists and has package info
               (order.subscription && 
@@ -177,9 +168,7 @@ const RemindersPage = () => {
       const token = localStorage.getItem('token');
       const timestamp = new Date().getTime();
       
-      const response = await api.get(`/reminder?t=${timestamp}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get(`/reminder?t=${timestamp}`);
       
       console.log('Fetched reminders:', response.data);
       
@@ -237,9 +226,7 @@ const RemindersPage = () => {
   const fetchPregnancyProfiles = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.get('/pregnancy-profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get('/pregnancy-profile');
       
       if (response.data && Array.isArray(response.data)) {
         setPregnancyProfiles(response.data);
@@ -294,13 +281,9 @@ const RemindersPage = () => {
       };
 
       if (editingReminder) {
-        await api.put(`/reminder/${editingReminder.id}`, data, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await api.put(`/reminder/${editingReminder.id}`, data)
       } else {
-        await api.post('/reminder', data, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await api.post('/reminder', data);
       }
       await fetchReminders();
       message.success(editingReminder 
@@ -322,9 +305,7 @@ const RemindersPage = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await api.delete(`/reminder/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await api.delete(`/reminder/${id}`);
       await fetchReminders();
       message.success('Xóa lời nhắc thành công');
     } catch (error) {

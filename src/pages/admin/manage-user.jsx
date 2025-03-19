@@ -34,7 +34,6 @@ const UserManagement = () => {
   const showEditModal = (user) => {
     setSelectedUser(user);
     form.setFieldsValue({
-      fullName: user.fullName,
       userName: user.userName,
       email: user.email,
       phone: user.phone,
@@ -119,12 +118,7 @@ const UserManagement = () => {
   };
 
   const columns = [
-    {
-      title: 'Họ tên',
-      dataIndex: 'fullName',
-      key: 'fullName',
-      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
-    },
+ 
     {
       title: 'Tên người dùng',
       dataIndex: 'userName',
@@ -215,13 +209,9 @@ const UserManagement = () => {
           onFinish={handleUpdate}
           initialValues={selectedUser}
         >
-          <Form.Item
-            name="fullName"
-            label="Họ tên"
-            rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
-          >
-            <Input />
-          </Form.Item>
+         
+            
+         
           <Form.Item
             name="userName"
             label="Tên người dùng"
@@ -279,13 +269,7 @@ const UserManagement = () => {
           layout="vertical"
           onFinish={handleAdd}
         >
-          <Form.Item
-            name="fullName"
-            label="Họ tên"
-            rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
-          >
-            <Input />
-          </Form.Item>
+       
           <Form.Item
             name="userName"
             label="Tên người dùng"

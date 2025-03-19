@@ -32,6 +32,10 @@ import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
 import OrderManagement from "./pages/admin/OrderManagement.jsx";
 import RemindersPage from "./pages/reminders/RemindersPage.jsx";
 import CommentManagement from "./pages/admin/CommentManagement.jsx";
+import Transaction from "./pages/transactions/Transaction.jsx";
+import Contact from './components/Footer/Contact.jsx';
+import PrivacyPolicy from './components/Footer/PrivacyPolicy.jsx';
+import TermsOfService from './components/Footer/TermsOfService.jsx';
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -115,8 +119,26 @@ const router = createBrowserRouter([
     {
       path: "/payment/cancel",
       element: <PaymentCancel/>
+    },
+   
+    {
+      path: "/transactions",
+      element: <Transaction/>
+    },
+    {
+      path: "/contact",
+      element: <Contact/>
+    },
+    {
+      path: "/privacy-policy",
+      element: <PrivacyPolicy/>
+    },
+    {
+      path: "/terms-of-service",
+      element: <TermsOfService/>
     }
     ]
+    
   },
 
   {

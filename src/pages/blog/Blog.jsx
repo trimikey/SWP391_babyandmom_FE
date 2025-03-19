@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Input, Spin, Button, Modal, message, Form } from 'antd';
 import { Link } from 'react-router-dom';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import blogApi from '../services/api.blog';
+import api from '../../config/axios';
 import moment from 'moment';
 import backgroundImage from '../../assets/background.jpg';
 import { useSelector } from 'react-redux';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
+
 const { Search } = Input;
-const { TextArea } = Input;
 
 const Blog = () => {
     const [blogs, setBlogs] = useState([]);
@@ -16,25 +18,59 @@ const Blog = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [form] = Form.useForm();
-    const currentUser = useSelector((state) => {
-        // Thử lấy user từ localStorage nếu không có trong Redux state
-        if (!state.auth.user) {
-            const savedUser = JSON.parse(localStorage.getItem('user'));
-            return savedUser;
-        }
-        return state.auth.user;
-    });
+    const [userNames, setUserNames] = useState({});
+    const [currentUser, setCurrentUser] = useState(null);
+    const [content, setContent] = useState(''); // State for rich text content
     
-    console.log('Current user in Blog:', currentUser); // Debug current user
+    const currentUserFromStore = useSelector((state) => state.auth.user);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            setCurrentUser(JSON.parse(storedUser));
+        } else if (currentUserFromStore) {
+            setCurrentUser(currentUserFromStore);
+        }
+    }, [currentUserFromStore]);
+
+    const fetchUserName = async (userId) => {
+        try {
+            // Kiểm tra nếu đã có trong cache
+            if (userNames[userId]) {
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const response = await api.get(`/user/profile`, {
+               
+            });
+            console.log('User response:', response.data);
+            // Lưu tên người dùng vào cache
+            setUserNames(prev => ({
+                ...prev,
+                [userId]: response.data.userName || response.data.email || 'Ẩn danh'
+            }));
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            setUserNames(prev => ({
+                ...prev,
+                [userId]: 'Ẩn danh'
+            }));
+        }
+    };
 
     const fetchBlogs = async () => {
         try {
             setLoading(true);
-            const data = await blogApi.getAllPosts();
-            console.log('Blogs data:', data); // Debug
-            setBlogs(data);
+            const token = localStorage.getItem('token');
+            const response = await api.get('/blogs', {
+               
+            });
+            
+            setBlogs(response.data);
         } catch (error) {
             console.error('Error fetching blogs:', error);
+            message.error('Không thể tải danh sách bài viết');
         } finally {
             setLoading(false);
         }
@@ -43,109 +79,165 @@ const Blog = () => {
     useEffect(() => {
         fetchBlogs();
     }, []);
- 
-    const filteredBlogs = blogs.filter(blog =>
-        blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        blog.content.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const handleDelete = async (id, e) => {
-        e.preventDefault();
-        try {
-            await blogApi.deletePost(id);
-            message.success('Xóa bài viết thành công');
-            fetchBlogs();
-        } catch (error) {
-            message.error('Không thể xóa bài viết');
-        }
-    };
 
     const handleSubmit = async (values) => {
         try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                message.error('Vui lòng đăng nhập lại');
+                return;
+            }
+
+            const requestData = {
+                title: values.title,
+                content: content // Use the rich text content
+            };
+
             if (selectedBlog) {
-                if (selectedBlog.userId !== currentUser.id) {
+                console.log('Checking permissions for update:', {
+                    currentUser,
+                    selectedBlog,
+                    hasPermission: checkPermission(selectedBlog)
+                });
+
+                if (!checkPermission(selectedBlog)) {
                     message.error('Bạn không có quyền sửa bài viết này');
+                    setIsModalVisible(false);
                     return;
                 }
-                await blogApi.updatePost(selectedBlog.id, values);
+
+                await api.put(`/blogs/${selectedBlog.id}`, requestData);
                 message.success('Cập nhật bài viết thành công');
             } else {
-                const postData = {
-                    ...values,
-                    userId: currentUser.id,
-                    userName: currentUser.name
-                };
-                await blogApi.createPost(postData);
+                await api.post('/blogs', requestData);
                 message.success('Tạo bài viết mới thành công');
             }
-            console.log(currentUser)    
-
             setIsModalVisible(false);
             form.resetFields();
             setSelectedBlog(null);
             fetchBlogs();
         } catch (error) {
-            message.error('Có lỗi xảy ra');
+            console.error('Error submitting blog:', error);
+            if (error.response?.status === 403) {
+                message.error('Bạn không có quyền thực hiện hành động này');
+            } else {
+                message.error('Có lỗi xảy ra khi lưu bài viết');
+            }
         }
     };
 
-    useEffect(() => {
-        if (selectedBlog) {
-            form.setFieldsValue(selectedBlog);
+    const handleDelete = async (id) => {
+        try {
+            const token = localStorage.getItem('token');
+            await api.delete(`/blogs/${id}`, {
+               
+            });
+            message.success('Xóa bài viết thành công');
+            fetchBlogs();
+        } catch (error) {
+            console.error('Error deleting blog:', error);
+            message.error('Có lỗi xảy ra khi xóa bài viết');
         }
-    }, [selectedBlog, form]);
+    };
+ 
+    const checkPermission = (blog) => {
+        console.log(blog);
+        const info = JSON.parse(localStorage.getItem('userInfo'));
+        const role = JSON.parse(localStorage.getItem('role'));
+        if(role === 'ADMIN' || info?.id === blog.userId){
+            return true;
+        }
+        return false;
+    }
+
+    const filteredBlogs = blogs.filter(blog =>
+        blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        blog.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const renderActionButtons = (blog) => {
-        console.log('Checking permissions for blog:', blog);
-        console.log('Current user for comparison:', currentUser);
-        
-        if (currentUser && (
-            String(currentUser.id) === String(blog.userId) || 
-            currentUser.role === 'ADMIN'
-        )) {
-            return [
-                <EditOutlined
-                    key="edit"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setSelectedBlog(blog);
-                        setIsModalVisible(true);
-                    }}
-                />,
-                <DeleteOutlined
-                    key="delete"
-                    onClick={(e) => handleDelete(blog.id, e)}
-                />
-            ];
+        const hasPermission = checkPermission(blog);
+        console.log("Check");
+        console.log(hasPermission);
+
+        if (!hasPermission) return null;
+
+        return [
+            <EditOutlined
+                key="edit"
+                onClick={(e) => {
+                    e.preventDefault();
+                    setSelectedBlog(blog);
+                    form.setFieldsValue(blog);
+                    setContent(blog.content); // Set content for editing
+                    setIsModalVisible(true);
+                }}
+            />,
+            <DeleteOutlined
+                key="delete"
+                onClick={(e) => {
+                    e.preventDefault();
+                    handleDelete(blog.id);
+                }}
+            />
+        ];
+    };
+
+    const handleLogin = async (credentials) => {
+        try {
+            const response = await api.post('/login', credentials);
+            const user = response.data.user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            // ... other login logic ...
+        } catch (error) {
+            console.error('Login failed:', error);
         }
-        return null;
+    };
+
+    const updateUserProfile = async (updatedInfo) => {
+        try {
+            const response = await api.put('/user/profile', updatedInfo);
+            const updatedUser = response.data;
+            setCurrentUser(updatedUser);
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            message.success('Profile updated successfully');
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            message.error('Failed to update profile');
+        }
     };
 
     return (
-        <div className="min-h-screen bg-cover bg-center bg-no-repeat"
+        <div className="min-h-screen bg-cover bg-center bg-no-repeat p-6"
             style={{ backgroundImage: `url(${backgroundImage})` }}>
             <div className="mb-8 flex justify-between items-center">
                 <h1 className="text-3xl font-semibold text-gray-800">Blog</h1>
-
-                <button 
-                    className="bg-pink-500 text-white px-2 py-2 rounded-md"
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={() => {
-                        setSelectedBlog(null);
-                        setIsModalVisible(true);
-                    }}
-                >
-                    Thêm bài viết
-                </button>
+                    <button 
+                        style={{
+                            color: 'white',
+                            padding: '10px 10px',
+                            borderRadius: '10px',
+                            border: 'none',
+                        }}
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={() => {
+                            setSelectedBlog(null);
+                            form.resetFields();
+                            setContent(''); // Reset content
+                            setIsModalVisible(true);
+                        }}
+                        className="bg-pink-500 hover:bg-pink-600 text-white"
+                    >
+                        Thêm bài viết
+                    </button>
             </div>
 
             <Search
                 placeholder="Tìm kiếm bài viết..."
                 allowClear
                 onChange={e => setSearchTerm(e.target.value)}
-                style={{ width: 300 }}
-                className="mb-6"
+                className="mb-6 w-72"
             />
 
             {loading ? (
@@ -192,6 +284,7 @@ const Blog = () => {
                     setIsModalVisible(false);
                     setSelectedBlog(null);
                     form.resetFields();
+                    setContent(''); // Reset content
                 }}
                 footer={null}
             >
@@ -199,7 +292,6 @@ const Blog = () => {
                     form={form}
                     layout="vertical"
                     onFinish={handleSubmit}
-                    initialValues={{ title: '', content: '' }}
                 >
                     <Form.Item
                         name="title"
@@ -210,25 +302,22 @@ const Blog = () => {
                     </Form.Item>
 
                     <Form.Item
-                        name="content"
                         label="Nội dung"
                         rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}
                     >
-                        <TextArea rows={6} />
+                        <ReactQuill theme="snow" value={content} onChange={setContent} />
                     </Form.Item>
 
                     <Form.Item className="text-right">
-                        <Button type="default" onClick={() => {
+                        <button type="default" onClick={() => {
                             setIsModalVisible(false);
-                            form.resetFields();
                             setSelectedBlog(null);
+                            form.resetFields();
+                            setContent(''); // Reset content
                         }} className="mr-2">
                             Hủy
-                        </Button>
-
-
-
-                        <button type="primary" htmlType="submit" className="bg-pink-500 text-white px-4 py-1 rounded-md">
+                        </button>
+                        <button type="primary" htmlType="submit" className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-1 rounded-lg ">
                             {selectedBlog ? 'Cập nhật' : 'Đăng bài'}
                         </button>
                     </Form.Item>

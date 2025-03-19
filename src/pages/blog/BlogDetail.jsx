@@ -34,11 +34,7 @@ const BlogDetail = () => {
                 const user = localStorage.getItem('user');
                 
                 // Log để debug
-                console.log('Checking localStorage keys:');
-                console.log('token exists:', !!token);
-                console.log('userInfo exists:', !!storedUserInfo);
-                console.log('userDetails exists:', !!userDetails);
-                console.log('user exists:', !!user);
+              
                 console.log('userInfo:', storedUserInfo);
                 
                 // Thử các nguồn dữ liệu khác nhau
@@ -77,9 +73,7 @@ const BlogDetail = () => {
     const fetchUserInfo = async (token) => {
         try {
             const response = await api.get('/user/profile', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+               
             });
             
             if (response.data) {
@@ -117,8 +111,7 @@ const BlogDetail = () => {
             }
 
             await api.post(`/comments/blog/${id}`, 
-                { content: newComment },
-                { headers: { 'Authorization': `Bearer ${token}` } }
+                { content: newComment }
             );
             
             setNewComment('');
@@ -139,8 +132,7 @@ const BlogDetail = () => {
         try {
             const token = localStorage.getItem('token');
             await api.put(`/comments/${editingComment}`, 
-                { content: editContent },
-                { headers: { 'Authorization': `Bearer ${token}` } }
+                { content: editContent }
             );
                 
             setEditingComment(null);
@@ -156,7 +148,6 @@ const BlogDetail = () => {
         try {
             const token = localStorage.getItem('token');
             await api.delete(`/comments/${commentId}`, 
-                { headers: { 'Authorization': `Bearer ${token}` } }
             );
             
             message.success('Bình luận đã được xóa');

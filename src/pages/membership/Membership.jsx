@@ -45,6 +45,14 @@ const Membership = () => {
     }).format(price);
   };
 
+  const getPackageTypeLabel = (type) => {
+    const typeMap = {
+      'BASIC': 'Cơ bản',
+      'PREMIUM': 'Cao cấp',
+    };
+    return typeMap[type] || type;
+  };
+
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>
@@ -73,6 +81,9 @@ const Membership = () => {
                       <h3 className="text-2xl font-bold text-gray-900 mb-4">
                         Gói {pkg.durationInMonths} tháng
                       </h3>
+                      <span className="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">
+                        {getPackageTypeLabel(pkg.type)}
+                      </span>
                     </div>
 
                     <div className="mt-6 text-center">
