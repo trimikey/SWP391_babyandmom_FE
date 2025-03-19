@@ -26,9 +26,7 @@ const Header = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await api.get('/user/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        
         });
         
         console.log('Header User Profile:', response.data); // Thêm log này để kiểm tra
@@ -66,11 +64,7 @@ const Header = () => {
   useEffect(() => {
     const fetchPregnancyProfile = async () => {
       try {
-        const response = await api.get('/pregnancy-profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const response = await api.get('/pregnancy-profile');
 
       //   const responsePregnancyRecords = await api.get(`/growth-records/current?profileId=${localStorage.getItem('profileId')}`, {
       //     headers: {

@@ -1,6 +1,5 @@
 import React from 'react';
-import HeaderU from '../../components/Header/HeaderU';
-import Footer from '../../components/Footer/Footer';
+
 import backgroundImage from '../../assets/background.jpg';
 
 const PregnancyEducation = () => {

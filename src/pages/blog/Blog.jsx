@@ -6,8 +6,10 @@ import api from '../../config/axios';
 import moment from 'moment';
 import backgroundImage from '../../assets/background.jpg';
 import { useSelector } from 'react-redux';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
+
 const { Search } = Input;
-const { TextArea } = Input;
 
 const Blog = () => {
     const [blogs, setBlogs] = useState([]);
@@ -18,6 +20,7 @@ const Blog = () => {
     const [form] = Form.useForm();
     const [userNames, setUserNames] = useState({});
     const [currentUser, setCurrentUser] = useState(null);
+    const [content, setContent] = useState(''); // State for rich text content
     
     const currentUserFromStore = useSelector((state) => state.auth.user);
 
@@ -65,17 +68,6 @@ const Blog = () => {
             });
             
             setBlogs(response.data);
-            
-            // Lấy danh sách unique userIds từ tất cả các blogs
-            const uniqueUserIds = [...new Set(response.data.map(blog => blog.userId))];
-            
-            // Fetch thông tin cho mỗi userId chưa có trong cache
-            uniqueUserIds.forEach(userId => {
-                if (!userNames[userId]) {
-                    fetchUserName(userId);
-                }
-            });
-
         } catch (error) {
             console.error('Error fetching blogs:', error);
             message.error('Không thể tải danh sách bài viết');
@@ -88,7 +80,6 @@ const Blog = () => {
         fetchBlogs();
     }, []);
 
-
     const handleSubmit = async (values) => {
         try {
             const token = localStorage.getItem('token');
@@ -96,6 +87,11 @@ const Blog = () => {
                 message.error('Vui lòng đăng nhập lại');
                 return;
             }
+
+            const requestData = {
+                title: values.title,
+                content: content // Use the rich text content
+            };
 
             if (selectedBlog) {
                 console.log('Checking permissions for update:', {
@@ -110,22 +106,10 @@ const Blog = () => {
                     return;
                 }
 
-                await api.put(`/blogs/${selectedBlog.id}`, 
-                    {
-                        title: values.title,
-                        content: values.content
-                    },
-                  
-                );
+                await api.put(`/blogs/${selectedBlog.id}`, requestData);
                 message.success('Cập nhật bài viết thành công');
             } else {
-                await api.post('/blogs', 
-                    {
-                        title: values.title,
-                        content: values.content
-                    },
-                    
-                );
+                await api.post('/blogs', requestData);
                 message.success('Tạo bài viết mới thành công');
             }
             setIsModalVisible(false);
@@ -185,6 +169,7 @@ const Blog = () => {
                     e.preventDefault();
                     setSelectedBlog(blog);
                     form.setFieldsValue(blog);
+                    setContent(blog.content); // Set content for editing
                     setIsModalVisible(true);
                 }}
             />,
@@ -227,18 +212,25 @@ const Blog = () => {
             style={{ backgroundImage: `url(${backgroundImage})` }}>
             <div className="mb-8 flex justify-between items-center">
                 <h1 className="text-3xl font-semibold text-gray-800">Blog</h1>
-                    <Button 
+                    <button 
+                        style={{
+                            color: 'white',
+                            padding: '10px 10px',
+                            borderRadius: '10px',
+                            border: 'none',
+                        }}
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={() => {
                             setSelectedBlog(null);
                             form.resetFields();
+                            setContent(''); // Reset content
                             setIsModalVisible(true);
                         }}
                         className="bg-pink-500 hover:bg-pink-600 text-white"
                     >
                         Thêm bài viết
-                    </Button>
+                    </button>
             </div>
 
             <Search
@@ -270,7 +262,7 @@ const Blog = () => {
                                                     {moment(blog.createdAt).format('DD/MM/YYYY HH:mm')}
                                                 </div>
                                                 <div className="text-sm text-gray-500">
-                                                    Người đăng: {userNames[blog.userId] || 'Đang tải...'}
+                                                    Người đăng: {blog.userName || 'Ẩn danh'}
                                                 </div>
                                                 <div className="line-clamp-3 text-gray-600">
                                                     {blog.content.replace(/<[^>]+>/g, '')}
@@ -292,6 +284,7 @@ const Blog = () => {
                     setIsModalVisible(false);
                     setSelectedBlog(null);
                     form.resetFields();
+                    setContent(''); // Reset content
                 }}
                 footer={null}
             >
@@ -309,24 +302,24 @@ const Blog = () => {
                     </Form.Item>
 
                     <Form.Item
-                        name="content"
                         label="Nội dung"
                         rules={[{ required: true, message: 'Vui lòng nhập nội dung' }]}
                     >
-                        <TextArea rows={6} />
+                        <ReactQuill theme="snow" value={content} onChange={setContent} />
                     </Form.Item>
 
                     <Form.Item className="text-right">
-                        <Button type="default" onClick={() => {
+                        <button type="default" onClick={() => {
                             setIsModalVisible(false);
                             setSelectedBlog(null);
                             form.resetFields();
+                            setContent(''); // Reset content
                         }} className="mr-2">
                             Hủy
-                        </Button>
-                        <Button type="primary" htmlType="submit" className="bg-pink-500">
+                        </button>
+                        <button type="primary" htmlType="submit" className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-1 rounded-lg ">
                             {selectedBlog ? 'Cập nhật' : 'Đăng bài'}
-                        </Button>
+                        </button>
                     </Form.Item>
                 </Form>
             </Modal>

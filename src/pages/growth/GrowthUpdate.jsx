@@ -212,9 +212,7 @@ const GrowthUpdate = () => {
     try {
       // Đầu tiên, lấy tất cả profiles
       const response = await api.get(`/pregnancy-profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+       
       });
       
       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
