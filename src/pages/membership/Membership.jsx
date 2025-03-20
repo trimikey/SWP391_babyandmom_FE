@@ -57,7 +57,6 @@ const Membership = () => {
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>
       
-      {/* Header */}
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4">
@@ -79,9 +78,8 @@ const Membership = () => {
                   <div>
                     <div className="text-center">
                       <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        Gói {pkg.durationInMonths} tháng
                       </h3>
-                      <span className="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">
+                      <span className="inline-block px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-lg font-medium ">
                         {getPackageTypeLabel(pkg.type)}
                       </span>
                     </div>
@@ -90,12 +88,12 @@ const Membership = () => {
                       <span className="text-4xl font-bold text-gray-900">
                         {formatPrice(pkg.price)}
                       </span>
-                      <span className="text-gray-600 ml-2">/gói</span>
+                      <span className="text-gray-600 ml-2">/1 tháng</span>
                     </div>
 
                     <div className="mt-8">
                       <div className="space-y-4">
-                        {pkg.features.split('\n').map((feature, index) => (
+                        {pkg.features.split('\n').filter(feature => feature.trim() !== '').map((feature, index) => (
                           <div key={index} className="flex items-start">
                             <svg className="h-6 w-6 text-pink-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

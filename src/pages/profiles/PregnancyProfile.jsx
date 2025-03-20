@@ -76,6 +76,10 @@ const PregnancyProfile = () => {
           lastPeriod: moment(data[0].lastPeriod),
           height: data[0].height
         });
+
+        // tính tuần thai neffffffffffffffff  chú ý số 1
+        const currentWeek = calculateCurrentWeek(data[0].lastPeriod);
+        localStorage.setItem('currentPregnancyWeek', currentWeek);
       }
     } catch (error) {
       message.error('Không thể tải thông tin thai kỳ');

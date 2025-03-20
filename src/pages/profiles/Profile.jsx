@@ -51,11 +51,7 @@ const UserProfile = () => {
           email: values.email,
           phone: values.phone
         },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+       
       );
 
       if (response.data) {
