@@ -30,11 +30,7 @@ const Payment = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const response = await api.get('/user/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/user/profile');
       
       if (response.data) {
         setUserProfile(response.data);
