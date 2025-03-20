@@ -238,7 +238,7 @@ const BlogDetail = () => {
                     renderItem={comment => (
                         <List.Item 
                             actions={
-                                userInfo && userInfo.email === comment.userEmail ? [
+                                userInfo && userInfo.id === comment.userId ? [
                                     <Button 
                                         icon={<EditOutlined />}
                                         onClick={() => handleEditComment(comment)}

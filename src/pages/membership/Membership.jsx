@@ -88,7 +88,7 @@ const Membership = () => {
                       <span className="text-4xl font-bold text-gray-900">
                         {formatPrice(pkg.price)}
                       </span>
-                      <span className="text-gray-600 ml-2">/1 tháng</span>
+                      <span className="text-gray-600 ml-2">/ tháng</span>
                     </div>
 
                     <div className="mt-8">
