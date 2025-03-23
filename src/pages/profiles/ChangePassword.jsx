@@ -12,7 +12,7 @@ const ChangePassword = () => {
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      const response = await api.put('password/change', {
+      const response = await api.put('user/change', {
         oldPassword: values.oldPassword,
         newPassword: values.newPassword,
         confirmPassword: values.confirmPassword

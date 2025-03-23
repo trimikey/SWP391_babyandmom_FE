@@ -12,7 +12,6 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        // Lấy orderId từ URL query parameters
         const queryParams = new URLSearchParams(location.search);
         const orderId = queryParams.get('orderId');
         
@@ -22,18 +21,15 @@ const PaymentSuccess = () => {
           return;
         }
         
-        // Cập nhật trạng thái đơn hàng (nếu cần)
-        await api.get(`/order/payment-success/${orderId}`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        
-        // Lấy thông tin chi tiết đơn hàng
+        // Fetch order details
         const response = await api.get(`/order/${orderId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         
         if (response.data && response.data.length > 0) {
           setOrderDetails(response.data[0]);
+        } else {
+          message.error('Không tìm thấy thông tin đơn hàng');
         }
       } catch (error) {
         console.error('Error fetching order details:', error);

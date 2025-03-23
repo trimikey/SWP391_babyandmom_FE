@@ -12,7 +12,6 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    userName:"",
   });
   
   const [errors, setErrors] = useState({});
@@ -68,7 +67,7 @@ const LoginPage = () => {
 
           // Lưu token
           localStorage.setItem('token', accessToken);
-          api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+          // api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
           
           toast.success('Đăng nhập thành công!');
 
@@ -77,9 +76,8 @@ const LoginPage = () => {
           } else {
             navigate('/');
           }
-
-          const userId = response.data.userId; // Adjust based on your response
-          localStorage.setItem('userId', userId);
+          // const userId = response.data.userId; // Adjust based on your response
+          // localStorage.setItem('userId', userId);
         }
       } catch (err) {
         console.error('Error:', err);
@@ -88,7 +86,6 @@ const LoginPage = () => {
         } else {
           setLoginError("Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.");
         }
-       
       } finally {
         setIsLoading(false);
       }
