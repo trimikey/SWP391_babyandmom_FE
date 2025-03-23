@@ -218,7 +218,7 @@ const Header = () => {
                         Thông tin thai kỳ
                       </button>
 
-                      <button
+                      {/* <button
                         onClick={() => {
                           handleNavigation('/growth-records');
                           setShowDropdown(false);
@@ -227,7 +227,7 @@ const Header = () => {
                       >
                         <FaBabyCarriage className="mr-3" />
                         Thông tin tăng trưởng
-                      </button>
+                      </button> */}
 
                       {/* Thêm mục Thêm lời nhắc */}
                       <button
