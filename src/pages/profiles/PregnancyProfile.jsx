@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card } from 'antd';
+import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card, Popconfirm } from 'antd';
 import pregnancyProfileApi from '../services/api.pregnancyProfile';
 import moment from 'moment';
 
@@ -120,6 +120,21 @@ const PregnancyProfile = () => {
       fetchProfile();
     } catch (error) {
       message.error('Có lỗi xảy ra: ' + (error.response?.data?.message || 'Vui lòng kiểm tra lại thông tin'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await pregnancyProfileApi.deleteProfile(profile.id);
+      message.success('Xóa hồ sơ thành công');
+      setProfile(null);
+      form.resetFields();
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      message.error('Không thể xóa hồ sơ');
     } finally {
       setLoading(false);
     }
@@ -250,14 +265,29 @@ const PregnancyProfile = () => {
             </Form.Item>
 
             <Form.Item className="text-center">
-              <button 
+              <Button 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
                 className="bg-pink-400 hover:bg-pink-400 border-pink-400 text-white px-8 py-2 rounded-lg"
               >
                 {profile ? 'Cập nhật' : 'Thêm mới'}
-              </button>
+              </Button>
+              {profile && (
+                <Popconfirm
+                  title="Bạn có chắc muốn xóa hồ sơ này?"
+                  onConfirm={handleDelete}
+                  okText="Có"
+                  cancelText="Không"
+                >
+                  <Button 
+                    type="danger" 
+                    className="ml-4"
+                  >
+                    Xóa
+                  </Button>
+                </Popconfirm>
+              )}
             </Form.Item>
           </Form>
         </Card>

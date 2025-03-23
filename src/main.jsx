@@ -137,6 +137,7 @@ const router = createBrowserRouter([
       path: "/terms-of-service",
       element: <TermsOfService/>
     }
+    
     ]
     
   },

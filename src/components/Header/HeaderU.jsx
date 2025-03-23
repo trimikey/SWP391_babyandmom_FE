@@ -253,6 +253,18 @@ const Header = () => {
                         Thông tin giao dịch
                       </button>
 
+                      {/* Add Change Password Menu Item */}
+                      <button
+                        onClick={() => {
+                          handleNavigation('/change-password');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      >
+                        <FaUserCircle className="mr-3" />
+                        Thay đổi mật khẩu
+                      </button>
+
                       <div className="border-t border-gray-100 my-1"></div>
 
                       <button

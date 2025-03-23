@@ -37,7 +37,8 @@ const UserManagement = () => {
       userName: user.userName,
       email: user.email,
       phone: user.phone,
-      status: user.status
+      status: user.status,
+      role: user.role
     });
     setEditModalVisible(true);
   };
@@ -65,7 +66,7 @@ const UserManagement = () => {
   const handleAdd = async (values) => {
     try {
       // Đây là giả định API endpoint, backend của bạn cần có API này
-      await api.post('/user/register', {
+      await api.post('/register', {
         ...values,
         role: 'MEMBER'
       });
@@ -117,6 +118,18 @@ const UserManagement = () => {
     );
   };
 
+  const renderRoleTag = (role) => {
+    let color = 'blue';
+    if (role === 'ADMIN') color = 'red';
+    if (role === 'MEMBER') color = 'green';
+
+    return (
+      <Tag color={color}>
+        {role}
+      </Tag>
+    );
+  };
+
   const columns = [
  
     {
@@ -133,6 +146,17 @@ const UserManagement = () => {
       title: 'Số điện thoại',
       dataIndex: 'phone',
       key: 'phone',
+    },
+    {
+      title: 'Vai trò',
+      dataIndex: 'role',
+      key: 'role',
+      render: renderRoleTag,
+      filters: [
+        { text: 'ADMIN', value: 'ADMIN' },
+        { text: 'MEMBER', value: 'MEMBER' },
+      ],
+      onFilter: (value, record) => record.role === value,
     },
     {
       title: 'Trạng thái',
@@ -211,6 +235,7 @@ const UserManagement = () => {
         >
          
             
+         
          
           <Form.Item
             name="userName"

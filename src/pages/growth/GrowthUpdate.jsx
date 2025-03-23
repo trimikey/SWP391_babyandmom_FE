@@ -217,6 +217,10 @@ const GrowthUpdate = () => {
         
         let selectedProfile;
         if (profileId) {
+
+
+
+          
           selectedProfile = response.data.find(profile => profile.id == profileId);
         }
         
