@@ -142,7 +142,7 @@ const PregnancyProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <style jsx>{`
+      {/* <style jsx>{`
         .ant-picker-header-view {
           color: #000000 !important;
           pointer-events: none !important;
@@ -170,7 +170,7 @@ const PregnancyProfile = () => {
         .ant-picker-year-panel {
           display: none !important;
         }
-      `}</style>
+      `}</style> */}
       <div className="max-w-3xl mx-auto">
         <Card className="shadow-lg rounded-lg">
           <h1 className="text-2xl font-semibold text-pink-400 mb-6 text-center">

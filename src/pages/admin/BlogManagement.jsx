@@ -45,31 +45,40 @@ const BlogManagement = () => {
 
     const handleDeleteOrRestore = async (id, isCurrentlyDeleted) => {
         try {
-            // Lấy thông tin bài viết hiện tại
             const blog = blogs.find(blog => blog.id === id);
             if (!blog) {
                 message.error('Không tìm thấy bài viết');
                 return;
             }
-            
-            // Cập nhật trạng thái isDeleted của bài viết
-            await api.put(`/blogs/${id}`, {
-                title: blog.title,
-                content: blog.content,
-                isDeleted: !isCurrentlyDeleted // Đảo ngược trạng thái
+
+            confirm({
+                title: isCurrentlyDeleted 
+                    ? 'Khôi phục bài viết?' 
+                    : 'Xóa bài viết?',
+                icon: <ExclamationCircleOutlined />,
+                content: isCurrentlyDeleted
+                    ? 'Bạn có chắc chắn muốn khôi phục bài viết này?'
+                    : 'Bạn có chắc chắn muốn xóa bài viết này?',
+                okText: isCurrentlyDeleted ? 'Khôi phục' : 'Xóa',
+                okType: isCurrentlyDeleted ? 'primary' : 'danger',
+                cancelText: 'Hủy',
+                async onOk() {
+                    try {                   
+                            // Xóa bài viết
+                          await api.delete(`/blogs/${id}`);                      
+                        fetchBlogs();
+                    } catch (error) {
+                        console.error('Action failed:', error);
+                        message.error(isCurrentlyDeleted 
+                            ? 'Không thể khôi phục bài viết' 
+                            : 'Không thể xóa bài viết'
+                        );
+                    }
+                },
             });
-            
-            message.success(isCurrentlyDeleted 
-                ? 'Khôi phục bài viết thành công'
-                : 'Xóa bài viết thành công');
-                
-            // Tải lại danh sách bài viết
-            fetchBlogs();
         } catch (error) {
             console.error('Action failed:', error);
-            message.error(isCurrentlyDeleted 
-                ? 'Không thể khôi phục bài viết' 
-                : 'Không thể xóa bài viết');
+            message.error('Có lỗi xảy ra');
         }
     };
 

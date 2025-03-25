@@ -34,10 +34,10 @@ const RegisterPage = () => {
   };
 
   const handleChange = (e) => {
-    
+
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (name === "password") setPasswordStrength(validatePassword(value));  
+    if (name === "password") setPasswordStrength(validatePassword(value));
   };
 
   const handleSubmit = async (e) => {
@@ -76,12 +76,35 @@ const RegisterPage = () => {
                   placeholder={`Nhập ${field === "userName" ? "tên người dùng" : field === "phoneNumber" ? "số điện thoại" : field === "email" ? "email" : "mật khẩu"}`}
                   value={formData[field]}
                   onChange={handleChange}
+                  
+                  
                 />
-                {field === "password" && (
-                  <button type="button" className="absolute inset-y-0 right-3" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <FaEyeSlash className="h-5 w-5 text-gray-400" /> : <FaEye className="h-5 w-5 text-gray-400" />}
-                  </button>
+                
+                {field === "password" && formData.password.length > 0 && (
+                  <div className="mt-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${passwordStrength >= 4 ? "bg-green-500 w-full" :
+                            passwordStrength === 3 ? "bg-yellow-500 w-3/4" :
+                              passwordStrength === 2 ? "bg-orange-400 w-1/2" :
+                                "bg-red-500 w-1/4"
+                          }`}
+                      />
+                      
+                    </div>
+                    <p className={`text-sm font-medium mt-1 ${passwordStrength >= 4 ? "text-green-600" : passwordStrength === 3 ? "text-yellow-600" : "text-red-500"}`}>
+                      {passwordStrength >= 4 ? "Mật khẩu mạnh ✅" :
+                        passwordStrength === 3 ? "Mật khẩu khá ổn" :
+                          passwordStrength === 2 ? "Mật khẩu yếu" :
+                            "Mật khẩu rất yếu"}
+                    </p>
+                    
+                  </div>
+                  
+
+
                 )}
+
               </div>
               {errors[field] && <p className="mt-2 text-sm text-red-600">{errors[field]}</p>}
             </div>
