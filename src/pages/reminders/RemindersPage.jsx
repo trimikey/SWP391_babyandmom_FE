@@ -17,7 +17,6 @@ const reminderTypeLabels = {
   PRENATAL_CHECKUP: 'Khám thai định kỳ',
   CUSTOM: 'Tùy chỉnh'
 };
-
 // Màu sắc cho các loại nhắc nhở
 const reminderTypeColors = {
   DOCTOR_APPOINTMENT: 'purple',
@@ -463,8 +462,7 @@ const RemindersPage = () => {
           message="Tính năng email nhắc nhở PREMIUM"
           description={
             <p>
-              Hệ thống sẽ tự động gửi email nhắc nhở cho bạn vào lúc 8:00 sáng trong ngày diễn ra lời nhắc,
-              và 20:00 tối hôm trước để bạn có thể chuẩn bị. Hãy đảm bảo email của bạn chính xác.
+              Hệ thống sẽ tự động gửi email nhắc nhở cho bạn vào lúc 8:00 sáng trong ngày diễn ra lời nhắc để bạn có thể chuẩn bị. Hãy đảm bảo email của bạn chính xác.
             </p>
           }
           type="success"

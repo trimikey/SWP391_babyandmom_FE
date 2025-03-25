@@ -17,7 +17,9 @@ const UserManagement = () => {
     setLoading(true);
     try {
       const response = await api.get('/user');
-      setUsers(response.data);
+      // Lọc ra những user chưa bị xóa (không có trạng thái BAN)
+      const activeUsers = response.data.filter(user => user.status !== 'BAN');
+      setUsers(activeUsers);
     } catch (error) {
       console.error('Failed to fetch users:', error);
       message.error('Không thể tải danh sách người dùng');
@@ -91,12 +93,13 @@ const UserManagement = () => {
     }
   };
 
-  // Xóa người dùng (thực tế là cập nhật trạng thái BAN)
+  // Xóa người dùng (cập nhật trạng thái BAN)
   const handleDelete = async (userId) => {
     try {
       await api.delete(`/user/${userId}`);
       message.success('Người dùng đã bị cấm');
-      fetchUsers();
+      // Cập nhật state users bằng cách lọc ra user vừa xóa
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
     } catch (error) {
       console.error('Failed to ban user:', error);
       message.error('Không thể cấm người dùng');
