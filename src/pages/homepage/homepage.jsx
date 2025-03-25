@@ -9,28 +9,9 @@ import { Link } from 'react-router-dom';
 import bannerImage4 from '../../assets/slide5.webp';
 import bannerImage5 from '../../assets/slide6.webp';
 import { Carousel } from 'antd';
-import ReminderButton from '../reminders/RemindersPage';
 
 const Homepage = () => {
-  const navigate = useNavigate();
-  const [pregnancyProfiles, setPregnancyProfiles] = useState([]);
-  
-  useEffect(() => {
-    // Kiểm tra thông tin user đã lưu
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const token = localStorage.getItem('token');
-
-    // Chỉ check profile nếu có userInfo và không phải ADMIN
-   
-
-    // Tải danh sách hồ sơ thai kỳ của người dùng
-    
-
-    
-  }, [navigate]);
-
-  return (  
-    
+  return (   
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>
       {/* Main Content */}
@@ -126,15 +107,7 @@ const Homepage = () => {
               </div>
             </section>
 
-            {/* Reminder Button */}
-            {pregnancyProfiles.length > 0 && (
-              <div className="mt-12 py-12 px-6 bg-pink-100/80 rounded-lg shadow-lg">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Quản lý nhắc nhở</h3>
-                <div className="flex justify-center">
-                  <ReminderButton pregnancyProfiles={pregnancyProfiles} />
-                </div>
-              </div>
-            )}
+           
           </div>
         </div>
       </main>
