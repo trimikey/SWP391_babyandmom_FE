@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -76,8 +75,6 @@ const RegisterPage = () => {
                   placeholder={`Nhập ${field === "userName" ? "tên người dùng" : field === "phoneNumber" ? "số điện thoại" : field === "email" ? "email" : "mật khẩu"}`}
                   value={formData[field]}
                   onChange={handleChange}
-                  
-                  
                 />
                 
                 {field === "password" && formData.password.length > 0 && (
@@ -100,9 +97,6 @@ const RegisterPage = () => {
                     </p>
                     
                   </div>
-                  
-
-
                 )}
 
               </div>
