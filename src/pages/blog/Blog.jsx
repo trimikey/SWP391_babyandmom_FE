@@ -5,7 +5,6 @@ import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
 import moment from 'moment';
 import backgroundImage from '../../assets/background.jpg';
-import { useSelector } from 'react-redux';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -19,7 +18,6 @@ const Blog = () => {
     const [selectedBlog, setSelectedBlog] = useState(null);
     const [content, setContent] = useState('');
     const [form] = Form.useForm();
-    const currentUser = useSelector((state) => state.auth.user);
 
     useEffect(() => {
         fetchBlogs();
