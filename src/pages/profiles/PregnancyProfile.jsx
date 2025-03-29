@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card, Popconfirm } from 'antd';
 import pregnancyProfileApi from '../services/api.pregnancyProfile';
 import moment from 'moment';
-
+import backgroundImage from '../../assets/background.jpg';
 const { Option } = Select;
 
 const PregnancyProfile = () => {
@@ -68,6 +68,10 @@ const PregnancyProfile = () => {
       const data = await pregnancyProfileApi.getAllProfiles();
       if (data && data.length > 0) {
         setProfile(data[0]);
+        
+        // Lưu profileId vào localStorage
+        localStorage.setItem('profileId', data[0].id);
+        
         form.setFieldsValue({
           babyName: data[0].babyName,
           babyGender: data[0].babyGender,
@@ -77,7 +81,7 @@ const PregnancyProfile = () => {
           height: data[0].height
         });
 
-        // tính tuần thai neffffffffffffffff  chú ý số 1
+        // tính tuần thai 
         const currentWeek = calculateCurrentWeek(data[0].lastPeriod);
         localStorage.setItem('currentPregnancyWeek', currentWeek);
       }
@@ -110,13 +114,20 @@ const PregnancyProfile = () => {
         return;
       }
 
+      let profileData;
       if (profile?.id) {
-        await pregnancyProfileApi.updateProfile(profile.id, formattedValues);
+        profileData = await pregnancyProfileApi.updateProfile(profile.id, formattedValues);
         message.success('Cập nhật thông tin thành công');
       } else {
-        await pregnancyProfileApi.createProfile(formattedValues);
+        profileData = await pregnancyProfileApi.createProfile(formattedValues);
         message.success('Thêm thông tin thành công');
+        
+        // Lưu profileId vào localStorage sau khi tạo mới
+        if (profileData && profileData.id) {
+          localStorage.setItem('profileId', profileData.id);
+        }
       }
+      
       fetchProfile();
     } catch (error) {
       message.error('Có lỗi xảy ra: ' + (error.response?.data?.message || 'Vui lòng kiểm tra lại thông tin'));
@@ -129,9 +140,18 @@ const PregnancyProfile = () => {
     try {
       setLoading(true);
       await pregnancyProfileApi.deleteProfile(profile.id);
+      
+      // Clear pregnancy-related data from localStorage
+      localStorage.removeItem('currentPregnancyWeek');
+      localStorage.removeItem('profileId');
+      
       message.success('Xóa hồ sơ thành công');
       setProfile(null);
       form.resetFields();
+      
+      // Redirect to home or another appropriate page if needed
+      // If you're using react-router-dom, uncomment the following:
+      // navigate('/');
     } catch (error) {
       console.error('Error deleting profile:', error);
       message.error('Không thể xóa hồ sơ');
@@ -141,7 +161,7 @@ const PregnancyProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cover p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>
       {/* <style jsx>{`
         .ant-picker-header-view {
           color: #000000 !important;
@@ -265,14 +285,14 @@ const PregnancyProfile = () => {
             </Form.Item>
 
             <Form.Item className="text-center">
-              <Button 
+              <button 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                className="bg-pink-400 hover:bg-pink-400 border-pink-400 text-white px-8 py-2 rounded-lg"
+                className="bg-pink-400 hover:bg-pink-400 border-pink-400 text-white px-3 py-1 rounded-lg"
               >
                 {profile ? 'Cập nhật' : 'Thêm mới'}
-              </Button>
+              </button>
               {profile && (
                 <Popconfirm
                   title="Bạn có chắc muốn xóa hồ sơ này?"
