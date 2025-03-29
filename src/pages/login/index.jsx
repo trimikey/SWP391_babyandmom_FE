@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import api from "../../config/axios";
 import logoImage from "../../assets/logo1.jpg";
+import backgroundImage from '../../assets/background.jpg';
+
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -46,6 +48,7 @@ const LoginPage = () => {
         };
         localStorage.setItem("userData", JSON.stringify(userData));
         localStorage.setItem("token", data.accessToken);
+        
         api.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
         toast.success("Đăng nhập thành công!");
         navigate(userData.role === "ADMIN" ? "/dashboard" : "/");
@@ -58,7 +61,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/src/assets/background.jpg')" }}>
+    <div className="min-h-screen bg-cover flex items-center justify-center p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>
       <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
         <img className="mx-auto h-16" src={logoImage} alt="Pregnancy Tracker Logo" />
         <h2 className="text-center text-3xl font-extrabold text-gray-900">Đăng nhập vào Baby&Mom</h2>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message, Popconfirm } from 'antd';
 import backgroundImage from '../../assets/background.jpg';
 import api from '../../config/axios';
 import { useParams, useNavigate } from 'react-router-dom';
+
 
 const GrowthUpdate = () => {
   const [form] = Form.useForm();
@@ -17,6 +18,7 @@ const GrowthUpdate = () => {
   const [currentBMI, setCurrentBMI] = useState(null);
   const [alertStatus, setAlertStatus] = useState(null);
   const [minPregnancyWeek, setMinPregnancyWeek] = useState(1);
+  const [profileExists, setProfileExists] = useState(true);
 
   useEffect(() => {
     // console.log('Current profileId:', profileId);
@@ -217,10 +219,6 @@ const GrowthUpdate = () => {
         
         let selectedProfile;
         if (profileId) {
-
-
-
-          
           selectedProfile = response.data.find(profile => profile.id == profileId);
         }
         
@@ -230,29 +228,54 @@ const GrowthUpdate = () => {
         
         if (selectedProfile && selectedProfile.currentWeek) {
           setMinPregnancyWeek(selectedProfile.currentWeek);
+          setProfileExists(true);
+        } else {
+          setProfileExists(false);
         }
       } else {
         console.warn('No pregnancy profiles found');
+        setProfileExists(false);
       }
     } catch (error) {
       console.error('Error fetching pregnancy profiles:', error);
       message.error('Không thể tải thông tin thai kỳ');
+      setProfileExists(false);
     }
   };
 
   useEffect(() => {
-    fetchPregnancyProfile();
-  }, []);
+    if (!profileExists) {
+      message.info('Không tìm thấy thông tin thai kỳ. Vui lòng tạo thông tin thai kỳ trước.');
+      // Redirect to pregnancy profile page after a short delay
+      const timer = setTimeout(() => {
+        navigate('/pregnancy-profile');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [profileExists, navigate]);
+
+  // Thêm hàm xử lý xóa bản ghi tăng trưởng
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await api.delete(`/growth-records/${id}`);
+      message.success('Xóa bản ghi tăng trưởng thành công');
+      
+      // Sau khi xóa, chuyển hướng về trang chính
+      navigate('/profile/pregnancy-profile');
+    } catch (error) {
+      console.error('Error deleting growth record:', error);
+      message.error('Không thể xóa bản ghi tăng trưởng');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen bg-cover p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>
       {/* Background với overlay */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
-      >
-        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
-      </div>
+     
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-8">
@@ -376,15 +399,37 @@ const GrowthUpdate = () => {
               </Form.Item>
             </div>
 
-            <Form.Item className="text-center mt-8">
+            <Form.Item className="text-center mt-8 flex justify-center gap-4">
               <button
                 type="submit"
-                className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full 
-                           transform transition-all duration-200 hover:scale-105 
-                           shadow-md hover:shadow-lg"
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full 
+                          transform transition-all duration-200 hover:scale-105 
+                          shadow-md hover:shadow-lg"
               >
                 {isEditing ? 'Cập Nhật' : 'Tạo Mới'}
               </button>
+              
+              {/* Thêm nút Xóa khi đang ở chế độ chỉnh sửa */}
+              {isEditing && id && (
+                <Popconfirm
+                  title="Bạn có chắc muốn xóa bản ghi tăng trưởng này?"
+                  onConfirm={handleDelete}
+                  okText="Có"
+                  cancelText="Không"
+                  okButtonProps={{ 
+                    className: "bg-red-500 hover:bg-red-600 border-red-500" 
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="bg-red-500 hover:bg-red-600 text-white px-8 py-2 rounded-full 
+                              transform transition-all duration-200 hover:scale-105 
+                              shadow-md hover:shadow-lg"
+                  >
+                    Xóa
+                  </button>
+                </Popconfirm>
+              )}
             </Form.Item>
           </Form>
         </div>

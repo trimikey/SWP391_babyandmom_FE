@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, message, Modal, Space, Tag } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import api from '../../config/axios';
+import backgroundImage from '../../assets/background.jpg';
 
 const Transaction = () => {
     const [transactions, setTransactions] = useState([]);
@@ -54,19 +55,19 @@ const Transaction = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        try {
-            await api.delete(`/transactions/${id}`);
-            message.success('Giao dịch đã bị xóa');
-            // Cập nhật state để ẩn transaction đã xóa
-            setTransactions(prevTransactions => 
-                prevTransactions.filter(transaction => transaction.id !== id)
-            );
-        } catch (error) {
-            console.error('Failed to delete transaction:', error);
-            message.error('Không thể xóa giao dịch');
-        }
-    };
+    // const handleDelete = async (id) => {
+    //     try {
+    //         await api.delete(`/transactions/${id}`);
+    //         message.success('Giao dịch đã bị xóa');
+    //         // Cập nhật state để ẩn transaction đã xóa
+    //         setTransactions(prevTransactions => 
+    //             prevTransactions.filter(transaction => transaction.id !== id)
+    //         );
+    //     } catch (error) {
+    //         console.error('Failed to delete transaction:', error);
+    //         message.error('Không thể xóa giao dịch');
+    //     }
+    // };
 
     const columns = [
         {
@@ -113,7 +114,7 @@ const Transaction = () => {
                     >
                         Xem
                     </Button>
-                    <Button 
+                    {/* <Button 
                         icon={<DeleteOutlined />} 
                         danger
                         onClick={() => {
@@ -127,40 +128,57 @@ const Transaction = () => {
                         }}
                     >
                         Xóa
-                    </Button>
+                    </Button> */}
                 </Space>
             ),
         },
     ];
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4">Lịch sử giao dịch của bạn</h1>
-            <Table 
-                columns={columns} 
-                dataSource={transactions} 
-                rowKey="id" 
-                loading={loading}
-                pagination={{ pageSize: 10 }}
-            />
-
-            <Modal
-                title="Chi tiết giao dịch"
-                open={modalVisible}
-                onCancel={() => setModalVisible(false)}
-                footer={null}
+        <div className="min-h-screen relative">
+            {/* Background image as main background */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${backgroundImage})` }}
             >
-                {selectedTransaction && (
-                    <div className="space-y-4">
-                        <p><strong>ID:</strong> {selectedTransaction.id}</p>
-                        <p><strong>Người dùng:</strong> {selectedTransaction.userName}</p>
-                        <p><strong>Số tiền:</strong> {new Intl.NumberFormat('vi-VN').format(selectedTransaction.totalPrice)} VNĐ</p>
-                        <p><strong>Phương thức thanh toán:</strong> {selectedTransaction.paymentMethod}</p>
-                        <p><strong>Trạng thái:</strong> {selectedTransaction.status}</p>
-                        <p><strong>Ngày tạo:</strong> {new Date(selectedTransaction.createdAt).toLocaleString()}</p>
-                    </div>
-                )}
-            </Modal>
+                <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
+            </div>
+            
+            {/* Content bg-white/50 là hàng  */}
+            <div className="relative z-10 container mx-auto px-4 py-8">   
+                <h1 className="text-3xl font-semibold text-center mb-6 text-pink-500   py-2 rounded-lg">
+                    Lịch sử giao dịch của bạn
+                </h1>
+                
+                <div className="bg-white/30 backdrop-blur-md rounded-lg shadow-lg overflow-hidden">
+                    <Table 
+                        columns={columns} 
+                        dataSource={transactions} 
+                        rowKey="id" 
+                        loading={loading}
+                        pagination={{ pageSize: 10 }}
+                        className="transaction-table"
+                    />
+
+                    <Modal
+                        title="Chi tiết giao dịch"
+                        open={modalVisible}
+                        onCancel={() => setModalVisible(false)}
+                        footer={null}
+                    >
+                        {selectedTransaction && (
+                            <div className="space-y-4">
+                                <p><strong>ID:</strong> {selectedTransaction.id}</p>
+                                <p><strong>Người dùng:</strong> {selectedTransaction.userName}</p>
+                                <p><strong>Số tiền:</strong> {new Intl.NumberFormat('vi-VN').format(selectedTransaction.totalPrice)} VNĐ</p>
+                                <p><strong>Phương thức thanh toán:</strong> {selectedTransaction.paymentMethod}</p>
+                                <p><strong>Trạng thái:</strong> {selectedTransaction.status}</p>
+                                <p><strong>Ngày tạo:</strong> {new Date(selectedTransaction.createdAt).toLocaleString()}</p>
+                            </div>
+                        )}
+                    </Modal>
+                </div>
+            </div>
         </div>
     );
 };
