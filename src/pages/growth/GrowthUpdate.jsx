@@ -276,6 +276,17 @@ const GrowthUpdate = () => {
     }
   };
 
+  // Custom validator cho cân nặng
+  const validateWeight = (rule, value) => {
+    if (value && (isNaN(value) || value <= 0)) {
+      return Promise.reject('Cân nặng phải là số dương');
+    }
+    if (value && value > 300) {
+      return Promise.reject('Cân nặng không được vượt quá 300kg');
+    }
+    return Promise.resolve();
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -386,7 +397,10 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Cân Nặng Hiện Tại (kg)"
                 name="pregnancyWeight"
-                rules={[{ required: true, message: 'Vui lòng nhập cân nặng hiện tại!' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập cân nặng hiện tại!' },
+                  { validator: validateWeight }
+                ]}
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
@@ -394,7 +408,7 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Chiều Cao Hiện Tại (cm)"
                 name="pregnancyHeight"
-                rules={[{ required: true, message: 'Vui lòng nhập chiều cao hiện tại!' }]}
+                
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
@@ -402,7 +416,10 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Cân Nặng Trước Thai Kỳ (kg)"
                 name="prePregnancyWeight"
-                rules={[{ required: true, message: 'Vui lòng nhập cân nặng trước thai kỳ!' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập cân nặng trước thai kỳ!' },
+                  { validator: validateWeight }
+                ]}
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>

@@ -7,8 +7,15 @@ import useMembershipAccess from '../../hooks/useMembershipAccess';
 import MembershipRequired from '../../pages/membership/MembershipRequired';
 const { Option } = Select;
 
+const LoadingScreen = ({ tip = "Đang tải..." }) => {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Spin size="large" tip={tip} />
+    </div>
+  );
+};
 const PregnancyProfile = () => {
-  const { isLoading, hasAccess } = useMembershipAccess();
+  const { isLoading, hasAccess, membershipStatus } = useMembershipAccess();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
   const [form] = Form.useForm();
@@ -164,15 +171,11 @@ const PregnancyProfile = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" tip="Đang kiểm tra quyền truy cập..." />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!hasAccess) {
-    return <MembershipRequired />;
+    return <MembershipRequired membershipStatus={membershipStatus} />;
   }
 
   return (
