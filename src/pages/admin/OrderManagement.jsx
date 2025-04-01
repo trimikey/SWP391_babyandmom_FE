@@ -22,7 +22,11 @@ const OrderManagement = () => {
     setLoading(true);
     try {
       const response = await api.get('/order/all');
-      setOrders(response.data);
+      // Sắp xếp đơn hàng theo thời gian tạo mới nhất
+      const sortedOrders = response.data.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setOrders(sortedOrders);
     } catch (error) {
       message.error('Không thể tải danh sách đơn hàng');
       console.error(error);
