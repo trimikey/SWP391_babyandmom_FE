@@ -65,22 +65,8 @@ const Header = () => {
     const fetchPregnancyProfile = async () => {
       try {
         const response = await api.get('/pregnancy-profile');
-
-      //   const responsePregnancyRecords = await api.get(`/growth-records/current?profileId=${localStorage.getItem('profileId')}`, {
-      //     headers: {
-      //       'Authorization': `Bearer ${token}`
-      //     },
-          
-      //   });
-      //   // console.log( responsePregnancyRecords);
-      //   console.log('Pregnancy Profile:', pregnancyProfile);
-      // console.log('Pregnancy Records:', pregnancyRecords);
-
-      //   setPregnancyRecords(responsePregnancyRecords.data);
-      //   // console.log('Pregnancy Profile:', response.data);
-      //   if (response.data && response.data.length > 0) {
-      //     setPregnancyProfile(response.data[0]); // Lấy profile đầu tiên
-       
+// Lấy profile đầu tiên
+  
         console.log('Pregnancy Profile Response:', response.data);
 
         if (response.data && response.data.length > 0) {
@@ -108,8 +94,6 @@ const Header = () => {
     }
   }, [token]);
 
-
-
   const handleNavigation = (path) => {
     if (path === '/growth-records') {
       // console.log('PregnancyProfile:', pregnancyProfile);
@@ -135,18 +119,10 @@ const Header = () => {
     // Xóa hoàn toàn thông tin đăng nhập
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    // Xóa bất kỳ thông tin lưu trữ nào khác liên quan đến session
-    
+    // Xóa bất kỳ thông tin lưu trữ nào khác liên quan đến session   
     // Force reload trang để xóa tất cả state trong bộ nhớ
     window.location.href = '/login';
   };
-
-  // Hiển thị modal thêm lời nhắc
-  
-
-  // Đóng modal
- 
-
 
   return (
     <>
@@ -217,17 +193,6 @@ const Header = () => {
                         <MdPregnantWoman className="mr-3" />
                         Thông tin thai kỳ
                       </button>
-
-                      {/* <button
-                        onClick={() => {
-                          handleNavigation('/growth-records');
-                          setShowDropdown(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                      >
-                        <FaBabyCarriage className="mr-3" />
-                        Thông tin tăng trưởng
-                      </button> */}
 
                       {/* Thêm mục Thêm lời nhắc */}
                       <button

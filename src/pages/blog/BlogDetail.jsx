@@ -24,6 +24,7 @@ const BlogDetail = () => {
         const token = localStorage.getItem('token');
         const storedUserInfo = localStorage.getItem('userInfo');
         if (token) {
+            // Chuyển chuỗi JSON thành object.
             setUserInfo(storedUserInfo ? JSON.parse(storedUserInfo) : fetchUserInfo(token));
         }
         fetchBlogDetail();
@@ -83,7 +84,7 @@ const BlogDetail = () => {
             message.success('Bình luận đã được đăng');
             fetchComments();
         } catch {
-            message.error('Không thể đăng bình luận');
+            message.error('Không thể đănbg bình luận');
         }
     };
 

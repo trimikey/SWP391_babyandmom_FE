@@ -6,14 +6,15 @@ const api = axios.create({
 
 api.interceptors.request.use(
     config => {
-      // Do something before request is sent
       const token = localStorage.getItem("token");
       if (token) {
+        // Bearer Token là một phương thức xác thực thông qua JSON Web
+        //  Token (JWT) hoặc một token khác mà server tạo ra khi đăng nhập.
         config.headers['Authorization'] = `Bearer ${token}`;
       }
       // console.log('Current token:', localStorage.getItem('token'));
       return config;
-    },
+    },  
     error => {
       console.log(error);
       console.log('token', token)      

@@ -91,20 +91,20 @@ const OrderManagement = () => {
       dataIndex: 'buyerPhone',
       key: 'buyerPhone',
     },
-    {
-      title: 'Gói thành viên',
-      dataIndex: 'subscription',
-      key: 'membershipType',
-      render: (subscription) => {
-        const membershipNames = {
-          'BASIC': 'Gói cơ bản',
-          'PREMIUM': 'Gói cao cấp',
-          'VIP': 'Gói VIP'
-        };
-        const type = subscription?.membershipPackage?.type;
-        return membershipNames[type] || type;
-      }
-    },
+    // {
+    //   title: 'Gói thành viên',
+    //   dataIndex: 'subscription',
+    //   key: 'membershipType',
+    //   render: (subscription) => {
+    //     const membershipNames = {
+    //       'BASIC': 'Gói cơ bản',
+    //       'PREMIUM': 'Gói cao cấp',
+    //       'VIP': 'Gói VIP'
+    //     };
+    //     const type = subscription?.membershipPackage?.type;
+    //     return membershipNames[type] || type;
+    //   }
+    // },
     {
       title: 'Giá (VNĐ)',
       dataIndex: 'totalPrice',
@@ -183,13 +183,13 @@ const OrderManagement = () => {
             <p><strong>Khách hàng:</strong> {selectedOrder.buyerName}</p>
             <p><strong>Email:</strong> {selectedOrder.buyerEmail}</p>
             <p><strong>Số điện thoại:</strong> {selectedOrder.buyerPhone}</p>
-            <p><strong>Gói thành viên:</strong> {
+            {/* <p><strong>Gói thành viên:</strong> {
               {
                 'BASIC': 'Gói cơ bản',
                 'PREMIUM': 'Gói cao cấp',
                 'VIP': 'Gói VIP'
               }[selectedOrder.subscription?.membershipPackage?.type] || selectedOrder.subscription?.membershipPackage?.type
-            }</p>
+            }</p> */}
             <p><strong>Thời hạn:</strong> {moment(selectedOrder.startDate).format('DD/MM/YYYY')} - {moment(selectedOrder.endDate).format('DD/MM/YYYY')}</p>
             <p><strong>Giá:</strong> {new Intl.NumberFormat('vi-VN').format(selectedOrder.totalPrice)} VNĐ</p>
             <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
