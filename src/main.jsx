@@ -115,7 +115,7 @@ const router = createBrowserRouter([
       element: <PaymentSuccess/>
     },
     {
-      path: "/payment/cancel",
+      path: "/payment/cancel/:orderId",
       element: <PaymentCancel/>
     },
    

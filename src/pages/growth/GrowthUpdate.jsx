@@ -3,6 +3,9 @@ import { Form, Input, Button, message, Popconfirm } from 'antd';
 import backgroundImage from '../../assets/background.jpg';
 import api from '../../config/axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import useMembershipAccess from '../../hooks/useMembershipAccess';
+import MembershipRequired from '../../pages/membership/MembershipRequired';
+import { Spin } from 'antd';
 
 
 const GrowthUpdate = () => {
@@ -19,6 +22,7 @@ const GrowthUpdate = () => {
   const [alertStatus, setAlertStatus] = useState(null);
   const [minPregnancyWeek, setMinPregnancyWeek] = useState(1);
   const [profileExists, setProfileExists] = useState(true);
+  const { isLoading, hasAccess } = useMembershipAccess();
 
   useEffect(() => {
     // console.log('Current profileId:', profileId);
@@ -272,6 +276,29 @@ const GrowthUpdate = () => {
     }
   };
 
+  // Custom validator cho cân nặng
+  const validateWeight = (rule, value) => {
+    if (value && (isNaN(value) || value <= 0)) {
+      return Promise.reject('Cân nặng phải là số dương');
+    }
+    if (value && value > 300) {
+      return Promise.reject('Cân nặng không được vượt quá 300kg');
+    }
+    return Promise.resolve();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Đang kiểm tra quyền truy cập..." />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return <MembershipRequired />;
+  }
+
   return (
     <div className="min-h-screen bg-cover p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>
       {/* Background với overlay */}
@@ -370,7 +397,10 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Cân Nặng Hiện Tại (kg)"
                 name="pregnancyWeight"
-                rules={[{ required: true, message: 'Vui lòng nhập cân nặng hiện tại!' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập cân nặng hiện tại!' },
+                  { validator: validateWeight }
+                ]}
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
@@ -378,7 +408,7 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Chiều Cao Hiện Tại (cm)"
                 name="pregnancyHeight"
-                rules={[{ required: true, message: 'Vui lòng nhập chiều cao hiện tại!' }]}
+                
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
@@ -386,7 +416,10 @@ const GrowthUpdate = () => {
               <Form.Item
                 label="Cân Nặng Trước Thai Kỳ (kg)"
                 name="prePregnancyWeight"
-                rules={[{ required: true, message: 'Vui lòng nhập cân nặng trước thai kỳ!' }]}
+                rules={[
+                  { required: true, message: 'Vui lòng nhập cân nặng trước thai kỳ!' },
+                  { validator: validateWeight }
+                ]}
               >
                 <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
