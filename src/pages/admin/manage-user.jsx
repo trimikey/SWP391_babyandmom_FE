@@ -46,10 +46,7 @@ const UserManagement = () => {
   };
 
   // Hiển thị modal thêm mới
-  const showAddModal = () => {
-    addForm.resetFields();
-    setAddModalVisible(true);
-  };
+
 
   // Cập nhật người dùng
   const handleUpdate = async (values) => {
@@ -65,21 +62,7 @@ const UserManagement = () => {
   };
 
   // Thêm người dùng mới
-  const handleAdd = async (values) => {
-    try {
-      // Đây là giả định API endpoint, backend của bạn cần có API này
-      await api.post('/register', {
-        ...values,
-        role: 'MEMBER'
-      });
-      message.success('Thêm người dùng thành công');
-      setAddModalVisible(false);
-      fetchUsers();
-    } catch (error) {
-      console.error('Failed to add user:', error);
-      message.error('Thêm người dùng thất bại');
-    }
-  };
+ 
 
   // Cập nhật trạng thái người dùng
   const handleStatusChange = async (userId, status) => {
@@ -203,17 +186,7 @@ const UserManagement = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Quản lý người dùng</h1>
-        <Button 
-          type="primary" 
-          icon={<UserAddOutlined />} 
-          onClick={showAddModal}
-         
-        >
-          Thêm người dùng
-        </Button>
-      </div>
+      
 
       <Table 
         columns={columns} 
@@ -286,68 +259,7 @@ const UserManagement = () => {
       </Modal>
 
       {/* Modal thêm người dùng mới */}
-      <Modal
-        title="Thêm người dùng mới"
-        open={addModalVisible}
-        onCancel={() => setAddModalVisible(false)}
-        footer={null}
-      >
-        <Form
-          form={addForm}
-          layout="vertical"
-          onFinish={handleAdd}
-        >
-       
-          <Form.Item
-            name="userName"
-            label="Tên người dùng"
-            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: 'Vui lòng nhập email!' },
-              { type: 'email', message: 'Email không hợp lệ!' }
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="Mật khẩu"
-            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item
-            name="phone"
-            label="Số điện thoại"
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="status"
-            label="Trạng thái"
-            initialValue="VERIFIED"
-          >
-            <Select>
-              <Select.Option value="VERIFIED">Đã xác minh</Select.Option>
-              <Select.Option value="UNVERIFIED">Chưa xác minh</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item className="flex justify-end">
-            <Button type="default" onClick={() => setAddModalVisible(false)} style={{ marginRight: 8 }}>
-              Hủy
-            </Button>
-            <Button type="primary" htmlType="submit" style={{ backgroundColor: '#ff85a2', borderColor: '#ff85a2' }}>
-              Thêm
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      
     </div>
   );
 };

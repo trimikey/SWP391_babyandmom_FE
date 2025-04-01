@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card, Popconfirm } from 'antd';
+import { Form, Input, Select, DatePicker, InputNumber, Button, message, Card, Popconfirm, Spin } from 'antd';
 import pregnancyProfileApi from '../services/api.pregnancyProfile';
 import moment from 'moment';
 import backgroundImage from '../../assets/background.jpg';
+import useMembershipAccess from '../../hooks/useMembershipAccess';
+import MembershipRequired from '../../pages/membership/MembershipRequired';
 const { Option } = Select;
 
 const PregnancyProfile = () => {
+  const { isLoading, hasAccess } = useMembershipAccess();
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
   const [form] = Form.useForm();
@@ -159,6 +162,18 @@ const PregnancyProfile = () => {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Đang kiểm tra quyền truy cập..." />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return <MembershipRequired />;
+  }
 
   return (
     <div className="min-h-screen bg-cover p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>

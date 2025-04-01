@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../../config/axios';
-import logoImage from '../../assets/logo.jpg';
+import logoImage from '../../assets/logo3.png';
 import { message } from 'antd';
 import { 
   FaSignOutAlt, 
@@ -94,6 +94,22 @@ const Header = () => {
     }
   }, [token]);
 
+  useEffect(() => {
+    const checkMembershipStatus = async () => {
+      try {
+        const response = await api.get('/pregnancy-profile/membership/status');
+        setMembershipStatus({
+          isBasic: response.data.isBasic,
+          isPremium: response.data.isPremium
+        });
+      } catch (error) {
+        console.error('Error checking membership status:', error);
+      }
+    };
+
+    checkMembershipStatus();
+  }, []);
+
   const handleNavigation = (path) => {
     if (path === '/growth-records') {
       // console.log('PregnancyProfile:', pregnancyProfile);
@@ -178,7 +194,7 @@ const Header = () => {
                           setShowDropdown(false);
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                      >
+                      > 
                         <FaUserCircle className="mr-3" />
                         Thông tin cá nhân
                       </button>

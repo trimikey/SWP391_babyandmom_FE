@@ -3,6 +3,9 @@ import { Form, Input, Button, message, Popconfirm } from 'antd';
 import backgroundImage from '../../assets/background.jpg';
 import api from '../../config/axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import useMembershipAccess from '../../hooks/useMembershipAccess';
+import MembershipRequired from '../../pages/membership/MembershipRequired';
+import { Spin } from 'antd';
 
 
 const GrowthUpdate = () => {
@@ -19,6 +22,7 @@ const GrowthUpdate = () => {
   const [alertStatus, setAlertStatus] = useState(null);
   const [minPregnancyWeek, setMinPregnancyWeek] = useState(1);
   const [profileExists, setProfileExists] = useState(true);
+  const { isLoading, hasAccess } = useMembershipAccess();
 
   useEffect(() => {
     // console.log('Current profileId:', profileId);
@@ -271,6 +275,18 @@ const GrowthUpdate = () => {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Đang kiểm tra quyền truy cập..." />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return <MembershipRequired />;
+  }
 
   return (
     <div className="min-h-screen bg-cover p-6" style={{ backgroundImage: `url(${backgroundImage})` }}>
