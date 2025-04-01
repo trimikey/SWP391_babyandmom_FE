@@ -19,7 +19,18 @@ const UserManagement = () => {
       const response = await api.get('/user');
       // Lọc ra những user chưa bị xóa (không có trạng thái BAN)
       const activeUsers = response.data.filter(user => user.status !== 'BAN');
-      setUsers(activeUsers);
+      
+      // Sắp xếp người dùng theo thời gian tạo mới nhất
+      const sortedUsers = activeUsers.sort((a, b) => {
+        // Nếu có trường createdAt hoặc createdDate, sử dụng nó để sắp xếp
+        if (a.createdAt && b.createdAt) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        // Nếu không có, sắp xếp theo ID (giả sử ID lớn hơn = mới hơn)
+        return b.id - a.id;
+      });
+      
+      setUsers(sortedUsers);
     } catch (error) {
       console.error('Failed to fetch users:', error);
       message.error('Không thể tải danh sách người dùng');
@@ -40,8 +51,7 @@ const UserManagement = () => {
       email: user.email,
       phone: user.phone,
       status: user.status,
-      role: user.role
-    });
+      });
     setEditModalVisible(true);
   };
 
@@ -133,17 +143,7 @@ const UserManagement = () => {
       dataIndex: 'phone',
       key: 'phone',
     },
-    {
-      title: 'Vai trò',
-      dataIndex: 'role',
-      key: 'role',
-      render: renderRoleTag,
-      filters: [
-        { text: 'ADMIN', value: 'ADMIN' },
-        { text: 'MEMBER', value: 'MEMBER' },
-      ],
-      onFilter: (value, record) => record.role === value,
-    },
+    
     {
       title: 'Trạng thái',
       dataIndex: 'status',

@@ -89,13 +89,7 @@ const MembershipPackages = () => {
                     >
                         Sửa
                     </Button>
-                    <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleDelete(record.id)}
-                    >
-                        Xóa
-                    </Button>
+                   
                 </Space>
             ),
         },
@@ -124,27 +118,7 @@ const MembershipPackages = () => {
         setIsModalVisible(true);
     };
 
-    const handleDelete = (id) => {
-        confirm({
-            title: 'Bạn có chắc chắn muốn xóa gói thành viên này?',
-            icon: <ExclamationCircleOutlined />,
-            content: 'Hành động này không thể hoàn tác',
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            async onOk() {
-                try {
-                    await api.delete(`/membership-packages/${id}`);
-                    message.success('Xóa gói thành viên thành công');
-                    fetchPackages();
-                } catch (error) {
-                    console.error('Failed to delete package:', error);
-                    message.error('Không thể xóa gói thành viên');
-                }
-            },
-        });
-    };
-
+  
     const handleSubmit = async (values) => {
         try {
             // Transform form data to match API structure
