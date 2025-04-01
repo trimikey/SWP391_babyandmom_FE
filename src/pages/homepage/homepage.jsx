@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import api from '../../config/axios';
 import backgroundImage from '../../assets/background.jpg';
 import bannerImage from '../../assets/banner2.jpg';
 import introImage from '../../assets/baby-intro2.jpg';

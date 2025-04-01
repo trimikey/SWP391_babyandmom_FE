@@ -190,7 +190,7 @@ const PregnancyProfile = () => {
         .ant-picker-year-panel {
           display: none !important;
         }
-      `}</style> */}
+      `}</style> */}  
       <div className="max-w-3xl mx-auto">
         <Card className="shadow-lg rounded-lg">
           <h1 className="text-2xl font-semibold text-pink-400 mb-6 text-center">
@@ -272,15 +272,15 @@ const PregnancyProfile = () => {
               label="Chiều cao (cm)"
               rules={[
                 { required: true, message: 'Vui lòng nhập chiều cao' },
-                { type: 'number', min: 0.1, message: 'Chiều cai phải lớn hơn 0' }
+                { type: 'number', min: 1, message: 'Chiều cai phải lớn hơn 0' }
               ]}
             >
               <InputNumber 
                 className="w-full rounded-lg"
                 placeholder="Nhập chiều cao" 
-                step={0.1}
+                step={1}
                 precision={1}
-                min={0.1}
+                min={1}
               />
             </Form.Item>
 
@@ -300,12 +300,12 @@ const PregnancyProfile = () => {
                   okText="Có"
                   cancelText="Không"
                 >
-                  <Button 
+                  <button 
                     type="danger" 
-                    className="ml-4"
+                    className="ml-4 w bg-red-500 hover:bg-red-600 rounded-lg px-3 py-1 border-red-500"
                   >
                     Xóa
-                  </Button>
+                  </button>
                 </Popconfirm>
               )}
             </Form.Item>

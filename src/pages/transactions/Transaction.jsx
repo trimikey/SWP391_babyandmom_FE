@@ -150,7 +150,7 @@ const Transaction = () => {
                     Lịch sử giao dịch của bạn
                 </h1>
                 
-                <div className="bg-white/30 backdrop-blur-md rounded-lg shadow-lg overflow-hidden">
+                <div className=" ">
                     <Table 
                         columns={columns} 
                         dataSource={transactions} 

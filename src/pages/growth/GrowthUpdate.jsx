@@ -305,13 +305,21 @@ const GrowthUpdate = () => {
                 </div>
               </div>
               
-              {weightWarning && (
+              {alertStatus && (
                 <div className={`p-4 border rounded-lg ${getAlertStatusColor(alertStatus)}`}>
                   <div className="flex items-start">
                     <span className="mr-2 text-xl">{getAlertStatusIcon(alertStatus)}</span>
                     <div>
-                      <h3 className="font-medium">Tình trạng: {alertStatus === 'NORMAL' ? 'Bình thường' : alertStatus === 'LOW' ? 'Thấp' : 'Cao'}</h3>
-                      <p>{translateWarning(weightWarning)}</p>
+                      <h3 className="font-medium">
+                        Tình trạng: {alertStatus === 'NORMAL' ? 'Bình thường' : alertStatus === 'LOW' ? 'Thấp' : 'Cao'}
+                      </h3>
+                      <p>
+                        {alertStatus === 'NORMAL' 
+                          ? "Mức tăng cân bình thường" 
+                          : alertStatus === 'LOW'
+                            ? "Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi"
+                            : "Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -364,7 +372,7 @@ const GrowthUpdate = () => {
                 name="pregnancyWeight"
                 rules={[{ required: true, message: 'Vui lòng nhập cân nặng hiện tại!' }]}
               >
-                <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
+                <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
 
               <Form.Item
@@ -372,7 +380,7 @@ const GrowthUpdate = () => {
                 name="pregnancyHeight"
                 rules={[{ required: true, message: 'Vui lòng nhập chiều cao hiện tại!' }]}
               >
-                <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
+                <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
 
               <Form.Item
@@ -380,7 +388,7 @@ const GrowthUpdate = () => {
                 name="prePregnancyWeight"
                 rules={[{ required: true, message: 'Vui lòng nhập cân nặng trước thai kỳ!' }]}
               >
-                <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
+                <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
 
               <Form.Item
@@ -388,7 +396,7 @@ const GrowthUpdate = () => {
                 name="prePregnancyHeight"
                 rules={[{ required: true, message: 'Vui lòng nhập chiều cao trước thai kỳ!' }]}
               >
-                <Input type="number" step="0.1" min={0} className="rounded-md w-full" />
+                <Input type="number" step="1" min={0} className="rounded-md w-full" />
               </Form.Item>
               
               <Form.Item
@@ -402,9 +410,8 @@ const GrowthUpdate = () => {
             <Form.Item className="text-center mt-8 flex justify-center gap-4">
               <button
                 type="submit"
-                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full 
-                          transform transition-all duration-200 hover:scale-105 
-                          shadow-md hover:shadow-lg"
+                className="bg-pink-400 hover:bg-pink-400 border-pink-400 text-white px-3 py-1 rounded-lg"
+
               >
                 {isEditing ? 'Cập Nhật' : 'Tạo Mới'}
               </button>
@@ -422,9 +429,8 @@ const GrowthUpdate = () => {
                 >
                   <button
                     type="button"
-                    className="bg-red-500 hover:bg-red-600 text-white px-8 py-2 rounded-full 
-                              transform transition-all duration-200 hover:scale-105 
-                              shadow-md hover:shadow-lg"
+                    className="ml-4 w bg-red-500 hover:bg-red-600 rounded-lg px-3 py-1 border-red-500"
+
                   >
                     Xóa
                   </button>
