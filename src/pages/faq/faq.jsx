@@ -11,7 +11,7 @@ const FaqPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const handleNavigation = (path) => {
+  const handleNavigation = (path) => {  
     navigate(path);
   };
 

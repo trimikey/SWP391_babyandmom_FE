@@ -296,13 +296,7 @@ const Header = () => {
                 <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
               </button>
               
-              <button 
-                onClick={() => handleNavigation('/growth-records')} 
-                className="text-gray-700 hover:text-pink-600 font-medium relative group py-4"
-              >
-                <span>Cập nhật tăng trưởng</span>
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
-              </button>
+             
             </div>
           </div>
         </nav>
