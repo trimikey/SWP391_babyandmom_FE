@@ -20,6 +20,7 @@ const UserManagement = () => {
       // Lọc ra những user chưa bị xóa (không có trạng thái BAN)
       const activeUsers = response.data.filter(user => user.status !== 'BAN');
       
+
       // Sắp xếp người dùng theo thời gian tạo mới nhất
       const sortedUsers = activeUsers.sort((a, b) => {
         // Nếu có trường createdAt hoặc createdDate, sử dụng nó để sắp xếp

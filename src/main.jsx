@@ -17,7 +17,7 @@ import Profile from "./pages/profiles/Profile.jsx";
 import FAQManagement from './pages/admin/FAQManagement.jsx';
 import MembershipPackages from './pages/admin/MembershipPackages.jsx';
 import MainLayout from "./components/layout/MainLayout.jsx";
-import PregnancyProfile from "./pages/profiles/PregnancyProfile.jsx";
+import PregnancyProfileManager from "./pages/profiles/PregnancyProfile.jsx";
 import BlogManagement from "./pages/admin/BlogManagement.jsx";
 import Blog from "./pages/blog/Blog.jsx";
 import ForgotPassword from "./pages/login/ForgotPassword.jsx";
@@ -27,6 +27,7 @@ import PaymentSuccess from "./pages/membership/PaymentSuccess.jsx";
 import PaymentCancel from "./pages/membership/PaymentCancel.jsx";
 import BlogDetail from "./pages/blog/BlogDetail.jsx";
 import GrowthUpdate from "./pages/growth/GrowthUpdate.jsx";
+import WeightGainChart from "./pages/growth/WeightGainChart.jsx";
 import OrderManagement from "./pages/admin/OrderManagement.jsx";
 import RemindersPage from "./pages/reminders/RemindersPage.jsx";
 import CommentManagement from "./pages/admin/CommentManagement.jsx";
@@ -34,6 +35,7 @@ import Transaction from "./pages/transactions/Transaction.jsx";
 import Contact from './components/Footer/Contact.jsx';
 import PrivacyPolicy from './components/Footer/PrivacyPolicy.jsx';
 import TermsOfService from './components/Footer/TermsOfService.jsx';
+
 // document.getElementById('root')
 // 1. Tìm tới root
 // 2. Lấy code ở trong App gắn vào root
@@ -48,6 +50,10 @@ const router = createBrowserRouter([
         element: <Blog/>,
       },
       {
+        path: "/blog-detail/:id",
+        element: <BlogDetail/>,
+      },
+      {
         path: "/",
         element: <HomePage/>,
       },
@@ -57,11 +63,11 @@ const router = createBrowserRouter([
       },
       {
         path:"/Profile/pregnancy-profile",
-        element: <PregnancyProfile/>
+        element: <PregnancyProfileManager/>
       },
       {
         path:"/Profile/pregnancy-profile/:id",
-        element: <PregnancyProfile/>
+        element: <PregnancyProfileManager/>
       },
       {path:"/pregnancy-care",
         element: <PregnancyCare/>
@@ -85,11 +91,11 @@ const router = createBrowserRouter([
         path: "growth-records/profile/:id",
         element: <GrowthUpdate />
       },
-      
       {
-        path: "blog-detail/:id",
-        element: <BlogDetail />
+        path: "growth-records/weight-chart/",
+        element: <WeightGainChart />
       },
+     
       {
         path:"/faq",
         element: <FAQ/>

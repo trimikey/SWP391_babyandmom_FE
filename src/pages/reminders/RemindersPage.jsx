@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag, Alert } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, MailOutlined } from '@ant-design/icons';
+import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag, Alert, Collapse, Checkbox, List, Divider, Typography } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MailOutlined, ExclamationCircleOutlined, InfoCircleOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import api from '../../config/axios';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 const { TextArea } = Input;
+const { Panel } = Collapse;
+const { Paragraph, Title } = Typography;
 
 // Ánh xạ loại nhắc nhở sang tiếng Việt
 const reminderTypeLabels = {
@@ -29,6 +31,9 @@ const reminderTypeColors = {
 // Cấu hình moment sử dụng locale tiếng Việt
 moment.locale('vi');
 
+// Danh sách các triệu chứng bất thường trong thai kỳ
+
+
 const RemindersPage = () => {
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,6 +46,8 @@ const RemindersPage = () => {
   const [form] = Form.useForm();
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [checkingPremium, setCheckingPremium] = useState(true);
+  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+  const [visibleAdvice, setVisibleAdvice] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -214,7 +221,7 @@ const RemindersPage = () => {
       console.error('Error setting reminder types:', error);
       setReminderTypes([
         'DOCTOR_APPOINTMENT',
-        'VACCINATION',
+        'VACCINATION',  
         'MEDICAL_TEST',
         'PRENATAL_CHECKUP',
         'CUSTOM'
@@ -318,6 +325,31 @@ const RemindersPage = () => {
     }
   };
 
+  const handleSymptomSelect = (symptomId) => {
+    const isSelected = selectedSymptoms.includes(symptomId);
+    
+    if (isSelected) {
+      setSelectedSymptoms(selectedSymptoms.filter(id => id !== symptomId));
+    } else {
+      setSelectedSymptoms([...selectedSymptoms, symptomId]);
+    }
+    
+    setVisibleAdvice(symptomId);
+  };
+
+  const getSymptomSeverityColor = (severity) => {
+    switch (severity) {
+      case 'high':
+        return '#f5222d';
+      case 'medium':
+        return '#fa8c16';
+      case 'low':
+        return '#52c41a';
+      default:
+        return '#1890ff';
+    }
+  };
+
   const columns = [
     {
       title: 'Tiêu đề',
@@ -384,20 +416,8 @@ const RemindersPage = () => {
     superPrevIcon: null,
   };
 
-  if (checkingPremium) {
-    return (
-      <div className="container mx-auto py-6 px-4">
-        <Card title="Quản lý lời nhắc" className="shadow-md">
-          <div className="py-8 text-center">
-            <div className="flex justify-center mb-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
-            </div>
-            <p className="text-gray-500">Đang kiểm tra quyền truy cập...</p>
-          </div>
-        </Card>
-      </div>
-    );
-  }
+  // Phần Triệu Chứng Bất Thường và Lời Khuyên
+  
 
   if (!isPremiumUser) {
     return (
@@ -480,6 +500,8 @@ const RemindersPage = () => {
           onChange={(pagination) => setPagination(pagination)}
         />
       </Card>
+
+      {/* Phần triệu chứng bất thường */}
 
       <Modal
         title={editingReminder ? "Chỉnh sửa lời nhắc" : "Thêm lời nhắc mới"}
