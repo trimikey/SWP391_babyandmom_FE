@@ -46,7 +46,7 @@ const useMembershipAccess = () => {
           window.history.replaceState({}, document.title, window.location.pathname);
         } 
         // Trường hợp đặc biệt: Nếu người dùng vừa hủy thanh toán, từ chối truy cập
-        else if (paymentCancel && hasMembership) {
+        else if (paymentCancel || !hasMembership) {
           setHasAccess(false);
           // Xóa query param
           window.history.replaceState({}, document.title, window.location.pathname);
