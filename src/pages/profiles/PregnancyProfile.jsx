@@ -53,7 +53,15 @@ const PregnancyProfileManager = () => {
     try {
       setLoadingProfiles(true);
       const data = await pregnancyProfileApi.getAllProfiles();
-      setProfiles(data);
+      const updatedProfiles = data.map(profile => {
+        const lastPeriodMoment = moment(profile.lastPeriod);
+        return {
+          ...profile,
+          dueDate: calculateDueDate(lastPeriodMoment),
+          currentWeek: calculateCurrentWeek(lastPeriodMoment),
+        };
+      });
+      setProfiles(updatedProfiles);
     } catch (error) {
       console.error("Error fetching profiles:", error);
       message.error("Không thể tải danh sách hồ sơ thai kỳ");
@@ -94,13 +102,8 @@ const PregnancyProfileManager = () => {
   
       form.setFieldsValue({
         dueDate: dueDate,
+        currentWeek: currentWeek,
       });
-  
-      if (!form.getFieldValue("currentWeek")) {
-        form.setFieldsValue({
-          currentWeek: currentWeek,
-        });
-      }
   
     } else {
       form.setFieldsValue({
@@ -254,13 +257,16 @@ const handleEditProfile = (profile) => {
       title: 'Giới tính',
       dataIndex: 'babyGender',
       key: 'babyGender',
-      render: gender => (
-        <Tag color={gender === 'MALE' ? 'blue' : 'pink'}>
-          {gender === 'MALE' ? 'Nam' : 'Nữ'}
-        </Tag>
-      ),
+      render: gender => {
+        if (gender === 'MALE') {
+          return <Tag color="blue">Nam</Tag>;
+        } else if (gender === 'FEMALE') {
+          return <Tag color="pink">Nữ</Tag>;
+        } else {
+          return <Tag color="gray">Chưa xác định</Tag>; // For undecided gender
+        }
+      },
     },
-   
     {
       title: 'Ngày dự sinh',
       dataIndex: 'dueDate',
@@ -394,6 +400,7 @@ const handleEditProfile = (profile) => {
                   <Select placeholder="Chọn giới tính" className="rounded-lg">
                     <Option value="MALE">Nam</Option>
                     <Option value="FEMALE">Nữ</Option>
+                    <Option value="NULL">Chưa Xác Định</Option>
                   </Select>
                 </Form.Item>
 

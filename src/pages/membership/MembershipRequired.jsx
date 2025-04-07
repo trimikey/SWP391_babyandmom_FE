@@ -18,7 +18,7 @@ const MembershipRequired = ({ membershipStatus }) => {
     actionText = "Thanh toán lại";
   } else {
     title = "Tính năng yêu cầu gói thành viên";
-    subTitle = "Để sử dụng tính năng này, bạn cần đăng ký gói Cơ bản hoặc Cao cấp.";
+    subTitle = "Để sử dụng tính năng này, bạn cần đăng ký gói Cao cấp.";
     actionText = "Đăng ký gói thành viên";
   }
 

@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, message, Popconfirm, Modal, Tag, Tooltip, notification } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  message,
+  Popconfirm,
+  Modal,
+  Tag,
+  Tooltip,
+  notification,
+} from "antd";
 import backgroundImage from "../../assets/background.jpg";
 import api from "../../config/axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -9,7 +19,11 @@ import { Spin } from "antd";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa6";
 import { FaChartLine } from "react-icons/fa";
-import { FaExclamationTriangle, FaInfoCircle, FaExclamationCircle } from "react-icons/fa";
+import {
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import PregnancyProfileManager from "../profiles/PregnancyProfile";
 import TextArea from "antd/es/input/TextArea";
 
@@ -19,50 +33,58 @@ const noteTemplates = [
     id: 1,
     text: "Cảm thấy đau bụng dưới khi vận động",
     severity: "medium",
-    warning: "Đau bụng dưới khi vận động có thể là dấu hiệu của giãn dây chằng hoặc biến chứng khác. Nếu đau kéo dài, hãy tham khảo ý kiến bác sĩ.",
+    warning:
+      "Đau bụng dưới khi vận động có thể là dấu hiệu của giãn dây chằng hoặc biến chứng khác. Nếu đau kéo dài, hãy tham khảo ý kiến bác sĩ.",
   },
   {
     id: 2,
     text: "Tăng cân đột ngột trong tuần qua",
     severity: "medium",
-    warning: "Tăng cân đột ngột có thể là dấu hiệu của tích nước, tiền sản giật. Cần theo dõi huyết áp và thông báo với bác sĩ trong lần khám tiếp theo.",
+    warning:
+      "Tăng cân đột ngột có thể là dấu hiệu của tích nước, tiền sản giật. Cần theo dõi huyết áp và thông báo với bác sĩ trong lần khám tiếp theo.",
   },
   {
     id: 3,
     text: "Sưng phù nhiều ở chân và mắt cá",
     severity: "high",
-    warning: "Phù nề ở chân, mắt cá chân và kết hợp với tăng cân nhanh có thể là dấu hiệu cảnh báo tiền sản giật. Cần đi khám ngay.",
+    warning:
+      "Phù nề ở chân, mắt cá chân và kết hợp với tăng cân nhanh có thể là dấu hiệu cảnh báo tiền sản giật. Cần đi khám ngay.",
   },
   {
     id: 4,
     text: "Giảm cân trong tuần này",
     severity: "high",
-    warning: "Giảm cân trong thai kỳ có thể ảnh hưởng đến sự phát triển của thai nhi. Hãy liên hệ với bác sĩ ngay lập tức.",
+    warning:
+      "Giảm cân trong thai kỳ có thể ảnh hưởng đến sự phát triển của thai nhi. Hãy liên hệ với bác sĩ ngay lập tức.",
   },
   {
     id: 5,
     text: "Cảm thấy mệt mỏi bất thường",
     severity: "medium",
-    warning: "Mệt mỏi quá mức có thể là dấu hiệu của thiếu máu hoặc thiếu hụt dinh dưỡng. Nên kiểm tra chế độ ăn uống và bổ sung sắt nếu cần.",
+    warning:
+      "Mệt mỏi quá mức có thể là dấu hiệu của thiếu máu hoặc thiếu hụt dinh dưỡng. Nên kiểm tra chế độ ăn uống và bổ sung sắt nếu cần.",
   },
   {
     id: 6,
     text: "Tăng cân bình thường theo tuần thai",
     severity: "low",
-    warning: "Tiếp tục duy trì chế độ ăn uống cân đối và lành mạnh để đảm bảo sự phát triển tốt của thai nhi.",
+    warning:
+      "Tiếp tục duy trì chế độ ăn uống cân đối và lành mạnh để đảm bảo sự phát triển tốt của thai nhi.",
   },
   {
     id: 7,
     text: "Đường huyết cao hơn bình thường",
     severity: "medium",
-    warning: "Đường huyết cao có thể là dấu hiệu của đái tháo đường thai kỳ. Cần theo dõi chế độ ăn và báo cáo với bác sĩ trong lần khám tiếp theo.",
+    warning:
+      "Đường huyết cao có thể là dấu hiệu của đái tháo đường thai kỳ. Cần theo dõi chế độ ăn và báo cáo với bác sĩ trong lần khám tiếp theo.",
   },
   {
     id: 8,
     text: "Huyết áp tăng cao hơn lần đo trước",
     severity: "high",
-    warning: "Huyết áp cao là dấu hiệu nguy hiểm trong thai kỳ, có thể dẫn đến tiền sản giật. Hãy đến cơ sở y tế ngay để được kiểm tra.",
-  }
+    warning:
+      "Huyết áp cao là dấu hiệu nguy hiểm trong thai kỳ, có thể dẫn đến tiền sản giật. Hãy đến cơ sở y tế ngay để được kiểm tra.",
+  },
 ];
 
 const GrowthUpdate = () => {
@@ -81,22 +103,19 @@ const GrowthUpdate = () => {
   const { isLoading, hasAccess } = useMembershipAccess();
   const [selectedRecordId, setSelectedRecordId] = useState(null);
 
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [isSelect, setSelect] = useState(0);
   const [isSelectProfile, setSelectProfile] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [showNoteWarning, setShowNoteWarning] = useState(false);
 
   useEffect(() => {
-    // console.log('Current profileId:', profileId);
     if (profileId) {
-      // console.log('Fetching growth records for profileId:', profileId);
       fetchPregnancyProfile();
     }
   }, [profileId]);
 
   useEffect(() => {
-    // Set isEditing dựa vào id từ params
-    // console.log('Current id:', id);
     if (id) {
       setIsEditing(true);
       fetchGrowthRecordById(id);
@@ -122,11 +141,10 @@ const GrowthUpdate = () => {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
 
   const showModal2 = () => {
-    setIsEditing(false); // ✅ Reset trạng thái về tạo mới
-
+    setIsEditing(false);
     setFormData((prevData) => ({
       ...prevData,
-      profileId: localStorage.getItem("profileId") || "",
+      profileId: selectedProfileId,
       pregnancyWeek: minPregnancyWeek ? (minPregnancyWeek + 1).toString() : "",
       pregnancyWeight: "",
       pregnancyHeight: "",
@@ -134,10 +152,8 @@ const GrowthUpdate = () => {
       prePregnancyHeight: "",
       notes: "",
     }));
-
     setIsModalOpen2(true);
   };
-
 
   const handleOk2 = () => {
     setIsModalOpen2(false);
@@ -150,7 +166,7 @@ const GrowthUpdate = () => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,  // Cập nhật giá trị vào formData
+      [name]: value,
     }));
     console.log("Updated formData:", { ...formData, [name]: value });
   };
@@ -177,17 +193,16 @@ const GrowthUpdate = () => {
 
   const handleGetListPregProfile = async (id) => {
     setFormData((prevData) => ({
-      ...prevData, // Giữ nguyên tất cả các trường còn lại
-      profileId: id, // Thay đổi giá trị profileId
+      ...prevData,
+      profileId: id,
     }));
 
     try {
       const response = await api.get(`/growth-records/current`, {
-        params: { profileId: id }, // Chuyển vào params
+        params: { profileId: id },
       });
 
       setSelectProfile(response?.data);
-      console.log(response?.data, "toibingu");
     } catch (err) {
       console.error("Error fetching pregnancy profile:", err.response || err);
     }
@@ -195,17 +210,21 @@ const GrowthUpdate = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate dữ liệu
-      if (!formData.pregnancyWeek) {
-        message.error("Vui lòng nhập tuần thai!");
-        return;
-      }
-  
-      if (!formData.pregnancyWeight || !formData.prePregnancyWeight || !formData.prePregnancyHeight) {
+      // if (!formData.pregnancyWeek) {
+      //   message.error("Vui lòng nhập tuần thai!");
+      //   return;
+      // }
+
+      if (
+        !formData.pregnancyWeight ||
+        !formData.prePregnancyWeight ||
+        !formData.prePregnancyHeight ||
+        !formData.pregnancyHeight
+      ) {
         message.error("Vui lòng nhập đầy đủ thông tin cân nặng và chiều cao!");
         return;
       }
-  
+
       const requestData = {
         ...formData,
         pregnancyWeek: Number(formData.pregnancyWeek),
@@ -213,32 +232,43 @@ const GrowthUpdate = () => {
         pregnancyHeight: Number(formData.pregnancyHeight),
         prePregnancyWeight: Number(formData.prePregnancyWeight),
         prePregnancyHeight: Number(formData.prePregnancyHeight),
+        profileId: selectedProfileId
       };
-  
-      // Kiểm tra nếu là tạo mới hoặc cập nhật
+
       if (isEditing) {
-        const response = await api.put(`/growth-records/${selectedRecordId}`, requestData);
+        const response = await api.put(
+          `/growth-records/${selectedRecordId}`,
+          requestData
+        );
         message.success("Cập nhật thành công!");
-        // Cập nhật dữ liệu mới sau khi cập nhật
-        handleGetListPregProfile(profileId);
+        handleGetListPregProfile(selectedProfileId);
         await fetchGrowthRecordById(selectedRecordId);
       } else {
         const response = await api.post("/growth-records", requestData);
         message.success("Tạo mới thành công!");
-        // Cập nhật lại danh sách bản ghi
-        setListPreg(prevList => [...prevList, response.data]); // Thêm bản ghi mới vào listPreg
-        setSelect(1); // Chuyển sang màn hình xem danh sách
+        setFormData({
+          profileId: "",
+          pregnancyWeek: "",
+          pregnancyWeight: "",
+          pregnancyHeight: "",
+          prePregnancyWeight: "",
+          prePregnancyHeight: "",
+          notes: "",
+        });
+        handleGetListPregProfile(selectedProfileId);
+        setSelect(1);
+        setIsModalOpen(false);
+        setIsModalOpen2(false);
       }
     } catch (error) {
       message.error("Đã có lỗi xảy ra khi thêm dữ liệu!");
       console.error("Đã có lỗi xảy ra khi thêm dữ liệu:", error);
     }
   };
-  
-
 
   const selectOnList = (id) => {
     setSelect((prev) => prev + 1);
+    setSelectedProfileId(id);
     handleGetListPregProfile(id);
   };
 
@@ -246,24 +276,17 @@ const GrowthUpdate = () => {
     handleGetListPregnantcy();
   }, []);
 
-  // const fetchGrowthRecords = async (data) => {
-  //   populateFormWithRecord(data.id);
-  //   setSelect((prev) => prev + 1);
-  //   setIsEditing(true);
-  //   console.log("asdasdasdsadsadsadasdsad", data);
-  // };
   const fetchGrowthRecords = async (record) => {
     if (!record || !record.id) {
       message.error("Dữ liệu không hợp lệ");
       return;
     }
 
-    setSelectedRecordId(record.id); // Ghi lại id đang sửa
-    populateFormWithRecord(record); // Truyền đúng object
+    setSelectedRecordId(record.id);
+    populateFormWithRecord(record);
     setSelect((prev) => prev + 1);
     setIsEditing(true);
   };
-
 
   const fetchGrowthRecordById = async (recordId) => {
     const token = localStorage.getItem("token");
@@ -289,37 +312,39 @@ const GrowthUpdate = () => {
       pregnancyHeight: record.pregnancyHeight,
       prePregnancyWeight: record.prePregnancyWeight,
       prePregnancyHeight: record.prePregnancyHeight,
-      notes: record.notes,  // Cập nhật ghi chú trong form khi chỉnh sửa
+      notes: record.notes,
     });
 
-    // Lưu thông tin BMI và cảnh báo
     setPreBMI(record.prePregnancyBMI);
     setCurrentBMI(record.currentBMI);
     setWeightWarning(record.weightWarning);
     setAlertStatus(record.alertStatus);
   };
 
-
   const onFinish = async (values) => {
     try {
-      // Kiểm tra các giá trị khác trước khi submit
-      if (!values.pregnancyWeight || !values.prePregnancyWeight || !values.prePregnancyHeight) {
+      if (
+        !values.pregnancyWeight ||
+        !values.prePregnancyWeight ||
+        !values.prePregnancyHeight ||
+        !values.pregnancyHeight
+      ) {
         message.error("Vui lòng nhập đầy đủ thông tin cân nặng và chiều cao!");
         return;
       }
 
-      // Nếu là cập nhật, bỏ qua kiểm tra tuần thai trùng
       if (isEditing && selectedRecordId) {
         const updatedData = { ...values };
-        updatedData.pregnancyWeek = Number(values.pregnancyWeek); // Chuyển tuần thai thành số để lưu trữ đúng cách
-        const response = await api.put(`/growth-records/${selectedRecordId}`, updatedData);
+        updatedData.pregnancyWeek = Number(values.pregnancyWeek);
+        const response = await api.put(
+          `/growth-records/${selectedRecordId}`,
+          updatedData
+        );
         message.success("Cập nhật thành công!");
 
-        // Cập nhật danh sách sau khi cập nhật thành công
-        handleGetListPregProfile(profileId);
+        handleGetListPregProfile(selectedProfileId);
         await fetchGrowthRecordById(selectedRecordId);
 
-        // Kiểm tra các ghi chú và hiển thị cảnh báo nếu cần
         checkNotesForWarnings(values.notes);
         setSelect(1);
       } else {
@@ -330,15 +355,14 @@ const GrowthUpdate = () => {
           prePregnancyWeight: Number(values.prePregnancyWeight),
           prePregnancyHeight: Number(values.prePregnancyHeight),
           notes: values.notes || "",
-          profileId: profileId,
+          profileId: selectedProfileId,
         };
 
         const response = await api.post("/growth-records", requestData);
         message.success("Tạo mới thành công!");
 
-        // Cập nhật lại danh sách sau khi thêm bản ghi mới
-        setListPreg(prevList => [...prevList, response.data]);
-        setSelect(1); // Chuyển sang màn hình xem danh sách
+        setListPreg((prevList) => [...prevList, response.data]);
+        setSelect(1);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -346,9 +370,6 @@ const GrowthUpdate = () => {
     }
   };
 
-
-
-  // Hàm để hiển thị đúng ngôn ngữ Tiếng Việt cho cảnh báo
   const translateWarning = (warning) => {
     if (
       warning.includes("too little") ||
@@ -366,7 +387,6 @@ const GrowthUpdate = () => {
     return warning;
   };
 
-  // Hàm để quyết định màu sắc dựa trên alert status
   const getAlertStatusColor = (status) => {
     switch (status) {
       case "THẤPTHẤP":
@@ -401,7 +421,6 @@ const GrowthUpdate = () => {
     return "Béo phì";
   };
 
-  // Màu sắc cho từng phân loại BMI
   const getBMIColorClass = (bmi) => {
     if (!bmi) return "text-gray-500";
     if (bmi < 18.5) return "text-blue-600";
@@ -410,7 +429,6 @@ const GrowthUpdate = () => {
     return "text-red-600";
   };
 
-  // Thêm hàm mới để lấy thông tin profile thai kỳ
   const fetchPregnancyProfile = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -456,7 +474,6 @@ const GrowthUpdate = () => {
       message.info(
         "Không tìm thấy thông tin thai kỳ. Vui lòng tạo thông tin thai kỳ trước."
       );
-      // Redirect to pregnancy profile page after a short delay
       const timer = setTimeout(() => {
         navigate("/pregnancy-profile");
       }, 2000);
@@ -465,14 +482,12 @@ const GrowthUpdate = () => {
     }
   }, [profileExists, navigate]);
 
-  // Thêm hàm xử lý xóa bản ghi tăng trưởng
   const handleDelete = async () => {
     try {
       setLoading(true);
       await api.delete(`/growth-records/${id}`);
       message.success("Xóa bản ghi tăng trưởng thành công");
 
-      // Sau khi xóa, chuyển hướng về trang chính
       navigate("/profile/pregnancy-profile");
     } catch (error) {
       console.error("Error deleting growth record:", error);
@@ -482,7 +497,6 @@ const GrowthUpdate = () => {
     }
   };
 
-  // Custom validator cho cân nặng
   const validateWeight = (rule, value) => {
     if (value && (isNaN(value) || value <= 0)) {
       return Promise.reject("Cân nặng phải là số dương");
@@ -493,73 +507,71 @@ const GrowthUpdate = () => {
     return Promise.resolve();
   };
 
-  // Check for direct navigation to growth records
   useEffect(() => {
     const showRecords = localStorage.getItem("showGrowthRecords");
     if (showRecords === "true" && profileId) {
-      // Set to screen 1 (records list) directly
       setSelect(1);
-      // Load the growth records for this profile
       handleGetListPregProfile(profileId);
-      // Remove the flag so it doesn't persist on refresh
       localStorage.removeItem("showGrowthRecords");
     }
   }, [profileId]);
 
   const handleSelectNote = (template) => {
-    const currentNotes = form.getFieldValue("notes") || "";  // lấy giá trị ghi chú hiện tại từ form
-    const newNotes = currentNotes ? `${currentNotes}\n${template.text}` : template.text;  // thêm ghi chú mới vào
-  
-    // Cập nhật lại giá trị cho trường 'notes' trong form
+    const currentNotes = form.getFieldValue("notes") || "";
+    const newNotes = currentNotes
+      ? `${currentNotes}\n${template.text}`
+      : template.text;
+
     form.setFieldsValue({ notes: newNotes });
-  
-    // Cập nhật lại formData (để đồng bộ nếu bạn cần sử dụng lại sau này)
+
     setFormData((prev) => ({
       ...prev,
-      notes: newNotes,  // Lưu ghi chú vào formData
+      notes: newNotes,
     }));
+
+    console.log(formData);
   };
 
   const getNoteSeverityColor = (severity) => {
     switch (severity) {
-      case 'high':
-        return '#f5222d';
-      case 'medium':
-        return '#fa8c16';
-      case 'low':
-        return '#52c41a';
+      case "high":
+        return "#f5222d";
+      case "medium":
+        return "#fa8c16";
+      case "low":
+        return "#52c41a";
       default:
-        return '#1890ff';
+        return "#1890ff";
     }
   };
 
   const getNoteSeverityIcon = (severity) => {
     switch (severity) {
-      case 'high':
+      case "high":
         return <FaExclamationTriangle className="text-red-500" />;
-      case 'medium':
+      case "medium":
         return <FaExclamationCircle className="text-orange-500" />;
-      case 'low':
+      case "low":
         return <FaInfoCircle className="text-green-500" />;
       default:
         return <FaInfoCircle className="text-blue-500" />;
     }
   };
 
-  // Hàm mới để kiểm tra các ghi chú và hiển thị cảnh báo
   const checkNotesForWarnings = (notes) => {
     if (!notes) return;
 
-    // Duyệt qua các mẫu ghi chú để tìm match
-    const matchedTemplates = noteTemplates.filter(template =>
+    const matchedTemplates = noteTemplates.filter((template) =>
       notes.includes(template.text)
     );
 
-    // Nếu có ghi chú cần cảnh báo, hiển thị thông báo
     if (matchedTemplates.length > 0) {
-      // Ưu tiên hiển thị cảnh báo có mức độ nghiêm trọng cao nhất
-      const highSeverityTemplates = matchedTemplates.filter(t => t.severity === 'high');
-      const mediumSeverityTemplates = matchedTemplates.filter(t => t.severity === 'medium');
+      const highSeverityTemplates = matchedTemplates.filter(
+        (t) => t.severity === "high"
+      );
+      const mediumSeverityTemplates = matchedTemplates.filter(
+        (t) => t.severity === "medium"
+      );
 
       let templateToShow;
 
@@ -571,44 +583,50 @@ const GrowthUpdate = () => {
         templateToShow = matchedTemplates[0];
       }
 
-      // Hiển thị notification với cảnh báo
       notification.open({
-        message: templateToShow.severity === 'high'
-          ? 'Cảnh báo quan trọng!'
-          : templateToShow.severity === 'medium'
-            ? 'Lưu ý'
-            : 'Thông tin',
+        message:
+          templateToShow.severity === "high"
+            ? "Cảnh báo quan trọng!"
+            : templateToShow.severity === "medium"
+            ? "Lưu ý"
+            : "Thông tin",
         description: templateToShow.warning,
-        duration: 10, // Hiển thị trong 10 giây
+        duration: 10,
         icon:
-          templateToShow.severity === 'high'
-            ? <FaExclamationTriangle style={{ color: '#f5222d' }} />
-            : templateToShow.severity === 'medium'
-              ? <FaExclamationCircle style={{ color: '#fa8c16' }} />
-              : <FaInfoCircle style={{ color: '#52c41a' }} />,
+          templateToShow.severity === "high" ? (
+            <FaExclamationTriangle style={{ color: "#f5222d" }} />
+          ) : templateToShow.severity === "medium" ? (
+            <FaExclamationCircle style={{ color: "#fa8c16" }} />
+          ) : (
+            <FaInfoCircle style={{ color: "#52c41a" }} />
+          ),
         style: {
-          borderLeft: `4px solid ${getNoteSeverityColor(templateToShow.severity)}`
+          borderLeft: `4px solid ${getNoteSeverityColor(
+            templateToShow.severity
+          )}`,
         },
-
       });
 
-      // Nếu có nhiều cảnh báo, hiển thị thông báo tổng hợp
       if (matchedTemplates.length > 1) {
         const highCount = highSeverityTemplates.length;
         const mediumCount = mediumSeverityTemplates.length;
 
-        let warningMessage = '';
+        let warningMessage = "";
 
         if (highCount > 0) {
           warningMessage += `${highCount} cảnh báo nghiêm trọng`;
         }
 
         if (mediumCount > 0) {
-          warningMessage += warningMessage ? ` và ${mediumCount} lưu ý cần chú ý` : `${mediumCount} lưu ý cần chú ý`;
+          warningMessage += warningMessage
+            ? ` và ${mediumCount} lưu ý cần chú ý`
+            : `${mediumCount} lưu ý cần chú ý`;
         }
 
         if (warningMessage) {
-          message.warning(`Bạn có ${warningMessage} trong ghi chú của bạn. Vui lòng xem xét kỹ.`);
+          message.warning(
+            `Bạn có ${warningMessage} trong ghi chú của bạn. Vui lòng xem xét kỹ.`
+          );
         }
       }
     }
@@ -625,9 +643,9 @@ const GrowthUpdate = () => {
   if (!hasAccess) {
     return <MembershipRequired />;
   }
-  /////////////////////////////////////////////////////////////////
+
   const extractDate = (isoString) => {
-    return isoString.split("T")[0]; // Lấy phần trước "T"
+    return isoString.split("T")[0];
   };
 
   return (
@@ -635,18 +653,13 @@ const GrowthUpdate = () => {
       className="min-h-screen bg-cover p-6"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      {/* Background với overlay */}
-
-      {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="max-w-xl mx-auto bg-white/80 backdrop-blur-md rounded-lg shadow-lg p-8">
-          {/* Weight chart button - appears in all views */}
           <div className="absolute top-4 right-4">
             <Link
               to="/growth-records/weight-chart"
               className="flex items-center gap-2 bg-pink-100 hover:bg-pink-200 text-pink-700 px-3 py-2 rounded-md transition-all"
               onClick={(e) => {
-                // Show loading message for better UX
                 message.loading("Đang tải biểu đồ tăng trưởng...", 1);
               }}
             >
@@ -655,7 +668,6 @@ const GrowthUpdate = () => {
             </Link>
           </div>
 
-          {/* ============================= */}
           {isSelect === 0 ? (
             <div>
               <h2 className="text-3xl font-semibold text-pink-600 mb-8 text-center">
@@ -673,27 +685,22 @@ const GrowthUpdate = () => {
                     style={{ borderRadius: "12px" }}
                   >
                     <div className="flex flex-row justify-center gap-2 items-center">
-
                       <p> Tên bé:</p>
                       <p className="text-[18px] font-semibold truncate w-[160px] text-left text-blue-600">
                         {item?.babyName}
                       </p>
-
                     </div>
-
 
                     <div className="flex flex-row justify-center gap-2 items-center">
                       <p>Giới tính : </p>
                       <p className="font-semibold text-[16px]">
-                        {item?.babyGender === "FEMALE" ? "Bé gái" : "Bé trai"}
+                        {item?.babyGender === "FEMALE"
+                          ? "Bé gái"
+                          : item?.babyGender === "MALE"
+                          ? "Bé trai"
+                          : "Chưa xác định"}
                       </p>
                     </div>
-                    {/* <div className="flex flex-row justify-center gap-2 items-center">
-                      <p>Tuần hiện tại : </p>
-                      <p className="font-semibold text-[16px]">
-                        {item?.currentWeek}
-                      </p>
-                    </div> */}
                   </button>
                 ))}
               </div>
@@ -711,7 +718,7 @@ const GrowthUpdate = () => {
             <div>
               <button
                 onClick={() => {
-                  setSelectedRecordId(null); // ✅ Reset khi quay lại
+                  setSelectedRecordId(null);
                   setSelect((prev) => prev - 1);
                 }}
                 className="flex flex-row items-center text-[16px] gap-2 hover:text-red-400 hover:cursor-pointer"
@@ -771,7 +778,6 @@ const GrowthUpdate = () => {
                   : "Cập nhật tăng trưởng"}
               </h2>
 
-              {/* Hiển thị BMI và cảnh báo nếu có */}
               {isEditing && (
                 <div className="mb-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -790,7 +796,6 @@ const GrowthUpdate = () => {
                       <h3 className="text-blue-700 font-medium mb-1">
                         BMI hiện tại
                       </h3>
-                      {/* chinh so BMI theo hang chuc */}
                       <p className="text-xl font-semibold">
                         {currentBMI ? Math.round(currentBMI) : "N/A"}
                       </p>
@@ -816,15 +821,15 @@ const GrowthUpdate = () => {
                             {alertStatus === "NORMAL"
                               ? "Bình thường"
                               : alertStatus === "LOW"
-                                ? "Thấp"
-                                : "Cao"}
+                              ? "Thấp"
+                              : "Cao"}
                           </h3>
                           <p>
                             {alertStatus === "NORMAL"
                               ? "Mức tăng cân bình thường"
                               : alertStatus === "LOW"
-                                ? "Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi"
-                                : "Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống"}
+                              ? "Tăng cân quá ít có thể ảnh hưởng đến sự phát triển của thai nhi"
+                              : "Tăng cân quá nhiều, cần kiểm soát chế độ ăn uống"}
                           </p>
                         </div>
                       </div>
@@ -847,19 +852,9 @@ const GrowthUpdate = () => {
                       { required: true, message: "Vui lòng nhập tuần thai!" },
                       {
                         validator: (_, value) => {
-                          if (isEditing && value === form.getFieldValue("pregnancyWeek")) {
-                            return Promise.resolve(); // Nếu tuần thai không thay đổi thì không cần kiểm tra
-                          }
-
                           const weekValue = parseInt(value);
-                          const existingWeeks = isSelectProfile.map(
-                            (record) => Number(record.pregnancyWeek)
-                          );
-                          if (existingWeeks.includes(weekValue)) {
-                            return Promise.reject("Tuần thai này đã tồn tại, vui lòng chọn tuần khác.");
-                          }
-                          if (weekValue < 1 || weekValue > 42) {
-                            return Promise.reject("Tuần thai phải từ 1 đến 42.");
+                          if (weekValue <= 1 || weekValue >= 43) {
+                            return Promise.reject("Tuần thai phải lớn hơn 1 và bé hơn 43.");
                           }
                           return Promise.resolve();
                         },
@@ -868,29 +863,32 @@ const GrowthUpdate = () => {
                   >
                     <Input
                       type="number"
-                      min={1}
+                      min={2}
                       max={42}
                       className="rounded-md w-full"
                     />
                   </Form.Item>
 
-
-
                   <Form.Item
                     label="Cân Nặng Hiện Tại (kg)"
                     name="pregnancyWeight"
                     rules={[
+                      { required: true, message: "Vui lòng nhập cân nặng hiện tại!" },
                       {
-                        required: true,
-                        message: "Vui lòng nhập cân nặng hiện tại!",
+                        validator: (_, value) => {
+                          if (value && (isNaN(value) || value <= 0 || value >= 200)) {
+                            return Promise.reject("Cân nặng phải là số dương và nhỏ hơn 200kg.");
+                          }
+                          return Promise.resolve();
+                        },
                       },
-                      { validator: validateWeight },
                     ]}
                   >
                     <Input
                       type="number"
-                      step="1"
+                      step="0.1"
                       min={0}
+                      max={199.9}
                       className="rounded-md w-full"
                     />
                   </Form.Item>
@@ -898,11 +896,23 @@ const GrowthUpdate = () => {
                   <Form.Item
                     label="Chiều Cao Hiện Tại (cm)"
                     name="pregnancyHeight"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập chiều cao hiện tại!" },
+                      {
+                        validator: (_, value) => {
+                          if (value && (isNaN(value) || value <= 0 || value >= 250)) {
+                            return Promise.reject("Chiều cao phải là số dương và nhỏ hơn 250cm.");
+                          }
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
                   >
                     <Input
                       type="number"
-                      step="1"
+                      step="0.1"
                       min={0}
+                      max={249.9}
                       className="rounded-md w-full"
                     />
                   </Form.Item>
@@ -911,17 +921,22 @@ const GrowthUpdate = () => {
                     label="Cân Nặng Trước Thai Kỳ (kg)"
                     name="prePregnancyWeight"
                     rules={[
+                      { required: true, message: "Vui lòng nhập cân nặng trước thai kỳ!" },
                       {
-                        required: true,
-                        message: "Vui lòng nhập cân nặng trước thai kỳ!",
+                        validator: (_, value) => {
+                          if (value && (isNaN(value) || value <= 0 || value >= 200)) {
+                            return Promise.reject("Cân nặng phải là số dương và nhỏ hơn 200kg.");
+                          }
+                          return Promise.resolve();
+                        },
                       },
-                      { validator: validateWeight },
                     ]}
                   >
                     <Input
                       type="number"
-                      step="1"
+                      step="0.1"
                       min={0}
+                      max={199.9}
                       className="rounded-md w-full"
                     />
                   </Form.Item>
@@ -930,34 +945,56 @@ const GrowthUpdate = () => {
                     label="Chiều Cao Trước Thai Kỳ (cm)"
                     name="prePregnancyHeight"
                     rules={[
+                      { required: true, message: "Vui lòng nhập chiều cao trước thai kỳ!" },
                       {
-                        required: true,
-                        message: "Vui lòng nhập chiều cao trước thai kỳ!",
+                        validator: (_, value) => {
+                          if (value && (isNaN(value) || value <= 0 || value >= 250)) {
+                            return Promise.reject("Chiều cao phải là số dương và nhỏ hơn 250cm.");
+                          }
+                          return Promise.resolve();
+                        },
                       },
                     ]}
                   >
                     <Input
                       type="number"
-                      step="1"
+                      step="0.1"
                       min={0}
+                      max={249.9}
                       className="rounded-md w-full"
                     />
                   </Form.Item>
 
                   <Form.Item label="Ghi chú" name="notes">
                     <div className="space-y-4">
-                      <Input.TextArea rows={4} className="rounded-md w-full" />
+                      <Input.TextArea
+                        rows={4}
+                        className="rounded-md w-full"
+                        value={formData.notes}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            notes: e.target.value,
+                          })
+                        }
+                      />
 
                       <div className="mt-2">
-                        <div className="text-sm text-gray-600 mb-2">Gợi ý ghi chú:</div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          Gợi ý ghi chú:
+                        </div>
                         <div className="grid grid-cols-2 gap-2">
-                          {noteTemplates.map(template => (
+                          {noteTemplates.map((template) => (
                             <button
                               key={template.id}
                               type="button"
                               onClick={() => handleSelectNote(template)}
                               className="border text-left px-3 py-2 rounded-md text-sm hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                              style={{ borderColor: getNoteSeverityColor(template.severity) }}
+                              style={{
+                                borderColor: getNoteSeverityColor(
+                                  template.severity
+                                ),
+                              }}
                             >
                               {getNoteSeverityIcon(template.severity)}
                               <span className="truncate">{template.text}</span>
@@ -965,8 +1002,6 @@ const GrowthUpdate = () => {
                           ))}
                         </div>
                       </div>
-
-                      {/* Xóa phần hiển thị cảnh báo ngay */}
                     </div>
                   </Form.Item>
                 </div>
@@ -982,12 +1017,9 @@ const GrowthUpdate = () => {
               </Form>
             </div>
           )}
-
-          {/* ============================= */}
         </div>
       </div>
 
-      {/* MODAL */}
       <Modal
         footer={[<></>]}
         open={isModalOpen}
@@ -998,7 +1030,6 @@ const GrowthUpdate = () => {
         <PregnancyProfileManager />
       </Modal>
 
-      {/* MODAL ADD REPORT */}
       <Modal
         footer={[<></>]}
         open={isModalOpen2}
@@ -1029,9 +1060,7 @@ const GrowthUpdate = () => {
                   min={1}
                   max={42}
                   onChange={handleInputChange}
-
                 />
-
               </div>
 
               <div className="mb-4">
@@ -1124,20 +1153,25 @@ const GrowthUpdate = () => {
                 />
 
                 <div className="mt-2">
-                  <div className="text-sm text-gray-600 mb-2">Gợi ý ghi chú:</div>
+                  <div className="text-sm text-gray-600 mb-2">
+                    Gợi ý ghi chú:
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {noteTemplates.map(template => (
+                    {noteTemplates.map((template) => (
                       <button
                         key={template.id}
                         type="button"
                         onClick={() => {
-                          // Cập nhật notes trong formData nhưng không hiển thị cảnh báo ngay
-                          const currentNotes = formData.notes || '';
-                          const newNotes = currentNotes ? `${currentNotes}\n${template.text}` : template.text;
+                          const currentNotes = formData.notes || "";
+                          const newNotes = currentNotes
+                            ? `${currentNotes}\n${template.text}`
+                            : template.text;
                           setFormData({ ...formData, notes: newNotes });
                         }}
                         className="border text-left px-3 py-2 rounded-md text-sm hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                        style={{ borderColor: getNoteSeverityColor(template.severity) }}
+                        style={{
+                          borderColor: getNoteSeverityColor(template.severity),
+                        }}
                       >
                         {getNoteSeverityIcon(template.severity)}
                         <span className="truncate">{template.text}</span>
@@ -1145,8 +1179,6 @@ const GrowthUpdate = () => {
                     ))}
                   </div>
                 </div>
-
-                {/* Xóa phần hiển thị cảnh báo ngay */}
               </div>
 
               <div className="text-center mt-8 flex justify-center gap-4">
