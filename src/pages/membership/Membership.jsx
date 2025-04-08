@@ -45,6 +45,8 @@ const Membership = () => {
   };
 
   const handleSubscribe = (pkg) => {
+    // Xóa trạng thái thanh toán cũ khi bắt đầu đăng ký mới
+    localStorage.removeItem('paymentStatus');
     navigate('/payment', {
       state: {
         packageId: pkg.id,
@@ -73,8 +75,10 @@ const Membership = () => {
 
   // Kiểm tra nếu người dùng đã có gói này
   const isPackageActive = (packageType) => {
-  if (packageType === 'PREMIUM') {
-      return userMembership.isPremium;
+    if (packageType === 'PREMIUM') {
+      // Chỉ khóa nút đăng ký khi đã thanh toán COMPLETED
+      const paymentStatus = localStorage.getItem('paymentStatus');
+      return userMembership.isPremium && paymentStatus === 'success';
     }
     return false;
   };
