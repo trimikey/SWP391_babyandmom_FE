@@ -101,19 +101,7 @@ const Payment = () => {
     }
   };
 
-  const handleSuccess = (orderId) => {
-    // Xử lý hiện tại
-    
-    // Sau khi xử lý thành công, chuyển hướng với tham số URL
-    navigate(`/profile/pregnancy-profile?payment=success`);
-  };
-
-  const handleCancel = () => {
-    // Xử lý hiện tại
-    
-    // Chuyển hướng với tham số URL
-    navigate(`/profile/pregnancy-profile?payment=cancel`);
-  };
+  
 
   if (!userProfile) {
     return (
