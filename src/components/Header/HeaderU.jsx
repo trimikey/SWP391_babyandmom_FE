@@ -19,6 +19,10 @@ const Header = () => {
   const token = localStorage.getItem('token');
   const [pregnancyProfile, setPregnancyProfile] = useState(null);
   const [pregnancyRecords, setPregnancyRecords] = useState(null);
+  const [membershipStatus, setMembershipStatus] = useState({
+    isBasic: false,
+    isPremium: false
+  });
   
   // State cho modal nhắc nhở
  
