@@ -4,48 +4,36 @@ import backgroundImage from '../../assets/background.jpg';
 
 import { Spin, message, Tag, Tooltip } from 'antd';
 import api from '../../config/axios';
-
+import useMembershipAccess from '../../hooks/useMembershipAccess';
 
 const Membership = () => {
   const navigate = useNavigate();
+  const { hasAccess, membershipStatus, isLoading: membershipLoading } = useMembershipAccess();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userMembership, setUserMembership] = useState({
-    isBasic: false,
-    isPremium: false
-  });
 
   useEffect(() => {
     fetchPackages();
-    checkUserMembership();
   }, []);
 
   const fetchPackages = async () => {
     try {
+      setLoading(true);
       const response = await api.get('membership-packages');
-      setPackages(response.data);
+      if (response.status === 200) {
+        setPackages(response.data);
+      } else {
+        throw new Error('Failed to fetch packages');
+      }
     } catch (error) {
+      console.error('Error fetching packages:', error);
       message.error('Không thể tải thông tin gói thành viên');
     } finally {
       setLoading(false);
     }
   };
 
-  // Thêm hàm kiểm tra gói thành viên của người dùng
-  const checkUserMembership = async () => {
-    try {
-      const response = await api.get('/pregnancy-profile/membership/status');
-      setUserMembership({
-        isBasic: response.data.isBasic,
-        isPremium: response.data.isPremium
-      });
-    } catch (error) {
-      console.error('Không thể kiểm tra trạng thái gói thành viên:', error);
-    }
-  };
-
   const handleSubscribe = (pkg) => {
-    // Xóa trạng thái thanh toán cũ khi bắt đầu đăng ký mới
     localStorage.removeItem('paymentStatus');
     navigate('/payment', {
       state: {
@@ -73,22 +61,16 @@ const Membership = () => {
     return typeMap[type] || type;
   };
 
-  // Kiểm tra nếu người dùng đã có gói này
   const isPackageActive = (packageType) => {
     if (packageType === 'PREMIUM') {
-      // Chỉ khóa nút đăng ký khi đã thanh toán COMPLETED
       const paymentStatus = localStorage.getItem('paymentStatus');
-      return userMembership.isPremium && paymentStatus === 'success';
+      return membershipStatus.isPremium && paymentStatus === 'success';
     }
-    return false;
+    return packageType === 'BASIC' && membershipStatus.isBasic;
   };
-
   return (
     <div className="min-h-screen bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${backgroundImage})` }}>
-
-
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4">
         <div className="bg-pink-100/95 backdrop-blur-sm rounded-lg shadow-lg p-8">
           <div className="text-center mb-12">
@@ -96,7 +78,7 @@ const Membership = () => {
             <p className="text-xl text-gray-700">Chọn gói phù hợp với nhu cầu của bạn</p>
           </div>
 
-          {loading ? (
+          {(loading || membershipLoading) ? (
             <div className="flex justify-center items-center h-64">
               <Spin size="large" />
             </div>
@@ -107,20 +89,12 @@ const Membership = () => {
                   className="bg-white/90 backdrop-blur-sm rounded-lg shadow-xl p-8 flex flex-col justify-between">
                   <div>
                     <div className="text-center">
-
-                      {pkg.type !== 'BASIC' && (
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        </h3>
-                      )}
                       <span className={`inline-block px-3 py-1 rounded-full text-lg font-medium ${pkg.type === 'BASIC' ? 'bg-green-100 text-green-700' : 'bg-pink-100 text-pink-700'
                         }`}>
                         {getPackageTypeLabel(pkg.type)}
                       </span>
-                      
-                      {/* Hiển thị thẻ "Đang sử dụng" nếu người dùng đã có gói này */}
-                        
                     </div>
-                    {/* thêm thángtháng */}
+
                     {pkg.type !== 'BASIC' && (
                       <div className="mt-6 text-center">
                         <span className="text-4xl font-bold text-gray-900">
@@ -144,7 +118,6 @@ const Membership = () => {
                     </div>
                   </div>
 
-                  {/* Nút đăng ký hoặc hiển thị thông báo đã đăng ký */}
                   {pkg.type !== 'BASIC' && (
                     isPackageActive(pkg.type) ? (
                       <Tooltip title="Bạn đã đăng ký gói này">
@@ -181,9 +154,10 @@ const Membership = () => {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
     </div>
+
+
+
   );
 };
 

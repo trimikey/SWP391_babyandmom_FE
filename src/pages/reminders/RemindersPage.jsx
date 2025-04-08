@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag, Alert, Collapse, Checkbox, List, Divider, Typography } from 'antd';
+import { Card, Button, Table, Space, Modal, Form, Input, Select, DatePicker, message, Popconfirm, Tag, Alert, Collapse, Checkbox, List, Divider, Typography, Spin } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, MailOutlined, ExclamationCircleOutlined, InfoCircleOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import api from '../../config/axios';
 import { useNavigate } from 'react-router-dom';
+import useMembershipAccess from '../../hooks/useMembershipAccess';
+import MembershipRequired from '../membership/MembershipRequired';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -35,6 +37,8 @@ moment.locale('vi');
 
 
 const RemindersPage = () => {
+  const navigate = useNavigate();
+  const { isLoading, hasAccess, membershipStatus } = useMembershipAccess();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -48,7 +52,6 @@ const RemindersPage = () => {
   const [checkingPremium, setCheckingPremium] = useState(true);
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [visibleAdvice, setVisibleAdvice] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -418,6 +421,18 @@ const RemindersPage = () => {
 
   // Phần Triệu Chứng Bất Thường và Lời Khuyên
   
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" tip="Đang kiểm tra quyền truy cập..." />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return <MembershipRequired membershipStatus={membershipStatus} />;
+  }
 
   if (!isPremiumUser) {
     return (
