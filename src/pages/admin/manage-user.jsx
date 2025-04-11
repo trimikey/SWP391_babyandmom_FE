@@ -62,10 +62,18 @@ const UserManagement = () => {
   // Cập nhật người dùng
   const handleUpdate = async (values) => {
     try {
-      await api.put(`/user/${selectedUser.id}`, values);
+      const updateData = {
+        userName: values.userName,
+        email: values.email,
+        phone: values.phone,
+        status: values.status
+      };
+
+      await api.put(`/user/${selectedUser.id}`, updateData);
       message.success('Cập nhật thông tin thành công');
       setEditModalVisible(false);
-      fetchUsers();
+      // Cập nhật lại danh sách người dùng ngay sau khi cập nhật thành công
+      await fetchUsers();
     } catch (error) {
       console.error('Failed to update user:', error);
       message.error('Cập nhật thông tin thất bại');
@@ -101,34 +109,11 @@ const UserManagement = () => {
   };
 
   // Render tag màu theo trạng thái
-  const renderStatusTag = (status) => {
-    let color = 'green';
-    if (status === 'UNVERIFIED') color = 'orange';
-    if (status === 'BANNED' || status === 'BAN') color = 'red';
-    
-    return (
-      <Tag color={color}>
-        {status === 'VERIFIED' ? 'Đã xác minh' : 
-         status === 'UNVERIFIED' ? 'Chưa xác minh' : 
-         status === 'BANNED' || status === 'BAN' ? 'Bị cấm' : status}
-      </Tag>
-    );
-  };
 
-  const renderRoleTag = (role) => {
-    let color = 'blue';
-    if (role === 'ADMIN') color = 'red';
-    if (role === 'MEMBER') color = 'green';
 
-    return (
-      <Tag color={color}>
-        {role}
-      </Tag>
-    );
-  };
+
 
   const columns = [
- 
     {
       title: 'Tên người dùng',
       dataIndex: 'userName',
@@ -144,12 +129,28 @@ const UserManagement = () => {
       dataIndex: 'phone',
       key: 'phone',
     },
-    
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      render: renderStatusTag,
+      render: (status, record) => (
+        <Select
+          value={status}
+          style={{ width: 120 }}
+          onChange={(value) => handleStatusChange(record.id, value)}
+          dropdownStyle={{ minWidth: '150px' }}
+        >
+          <Select.Option value="VERIFIED">
+            <Tag>Đã xác minh</Tag>
+          </Select.Option>
+          <Select.Option value="UNVERIFIED">
+            <Tag>Chưa xác minh</Tag>
+          </Select.Option>
+          <Select.Option value="BAN">
+            <Tag>Bị cấm</Tag>
+          </Select.Option>
+        </Select>
+      ),
       filters: [
         { text: 'Đã xác minh', value: 'VERIFIED' },
         { text: 'Chưa xác minh', value: 'UNVERIFIED' },
@@ -157,6 +158,7 @@ const UserManagement = () => {
       ],
       onFilter: (value, record) => record.status === value,
     },
+    
     {
       title: 'Thao tác',
       key: 'action',
@@ -169,17 +171,7 @@ const UserManagement = () => {
           >
             Sửa
           </Button>
-          <Popconfirm
-            title="Cấm người dùng này?"
-            description="Hành động này sẽ cấm người dùng, bạn có chắc chắn không?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Đồng ý"
-            cancelText="Hủy"
-          >
-            <Button type="primary" danger icon={<DeleteOutlined />}>
-              Xóa
-            </Button>
-          </Popconfirm>
+      
         </Space>
       ),
     },
@@ -237,17 +229,7 @@ const UserManagement = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Trạng thái"
-            rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
-          >
-            <Select>
-              <Select.Option value="VERIFIED">Đã xác minh</Select.Option>
-              <Select.Option value="UNVERIFIED">Chưa xác minh</Select.Option>
-              <Select.Option value="BAN">Bị cấm</Select.Option>
-            </Select>
-          </Form.Item>
+          
           <Form.Item className="flex justify-end">
             <Button type="default" onClick={() => setEditModalVisible(false)} style={{ marginRight: 8 }}>
               Hủy
