@@ -164,6 +164,23 @@ const WeightGainChart = () => {
   // Custom tooltip for the chart
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const actualWeight = payload.find(entry => entry.dataKey === 'actualWeight')?.value;
+      const standardWeight = payload.find(entry => entry.dataKey === 'standardWeight')?.value;
+      const minWeight = payload.find(entry => entry.dataKey === 'minWeight')?.value;
+      const maxWeight = payload.find(entry => entry.dataKey === 'maxWeight')?.value;
+
+      let warningMessage = null;
+      if (actualWeight && standardWeight) {
+        const weightDiff = actualWeight - standardWeight;
+        const weightDiffPercent = (weightDiff / standardWeight) * 100;
+        
+        if (weightDiffPercent < -10) {
+          warningMessage = "⚠️ Cân nặng thấp hơn tiêu chuẩn. Cần tăng cường dinh dưỡng.";
+        } else if (weightDiffPercent > 10) {
+          warningMessage = "⚠️ Cân nặng cao hơn tiêu chuẩn. Cần kiểm soát chế độ ăn uống.";
+        }
+      }
+
       return (
         <div className="bg-white p-3 border border-gray-200 rounded shadow-md">
           <p className="font-semibold">{`Tuần thai: ${label}`}</p>
@@ -197,6 +214,9 @@ const WeightGainChart = () => {
               </p>
             );
           })}
+          {warningMessage && (
+            <p className="mt-2 text-red-500 font-medium">{warningMessage}</p>
+          )}
         </div>
       );
     }

@@ -854,7 +854,7 @@ const GrowthUpdate = () => {
                         validator: (_, value) => {
                           const weekValue = parseInt(value);
                           if (weekValue <= 1 || weekValue >= 43) {
-                            return Promise.reject("Tuần thai phải lớn hơn 1 và bé hơn 43.");
+                            return Promise.reject("Tuần thai phải  từ 1 đến 42.");
                           }
                           return Promise.resolve();
                         },
@@ -877,7 +877,7 @@ const GrowthUpdate = () => {
                       {
                         validator: (_, value) => {
                           if (value && (isNaN(value) || value <= 0 || value >= 200)) {
-                            return Promise.reject("Cân nặng phải là số dương và nhỏ hơn 200kg.");
+                            return Promise.eject("Cân nặng phải là số dương và nhỏ hơn 200kg.");
                           }
                           return Promise.resolve();
                         },
